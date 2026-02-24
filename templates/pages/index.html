@@ -1,0 +1,64 @@
+{% extends "components/base.html" %}
+
+{% block content %}
+<form id="cepForm">
+    <label for="cep">CEP</label>
+    <input 
+        type="text" 
+        id="cep" 
+        name="cep"
+        placeholder="00000-000"
+        pattern="\d{5}-?\d{3}"
+        required
+    >
+    <button type="submit">Consultar</button>
+</form>
+<label for="endereco">Resultado</label>
+<textarea 
+id="endereco" 
+rows="4" 
+readonly
+placeholder="O endereço aparecerá aqui..."
+></textarea>
+{% endblock %}
+
+{% block script %}
+<script>
+    const form = document.getElementById("cepForm");
+    const cepInput = document.getElementById("cep");
+    const resultado = document.getElementById("endereco");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const cep = cepInput.value.replace(/\D/g, "");
+        if (cep.length !== 8) {
+            resultado.value = "CEP inválido.";
+            return;
+        }
+
+        resultado.value = "Consultando...";
+
+        try {
+            const response = await fetch(`/cep/${cep}`);
+            if (!response.ok) throw new Error("Erro na requisição");
+
+            const data = await response.json();
+
+            if (data.erro) {
+                resultado.value = data.mensagem || "CEP não encontrado.";
+                return;
+            }
+
+            const { logradouro, bairro, localidade, uf } = data.content;
+
+            resultado.value =
+                `${logradouro}\n${bairro}\n${localidade} - ${uf}`;
+
+        } catch (err) {
+            resultado.value = "Erro ao consultar API.";
+        }
+    });
+</script>
+{% endblock %}
+
