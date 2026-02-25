@@ -11,8 +11,23 @@ class CEP:
         self.brasilapi = brasilapi
 
 
+    async def get_dashboard(self) -> dict:
+        """
+        Retorna os dados do dashboard.
+        """
+        total_consultas = self.db.get_total_consultas()
+        top_ceps = self.db.get_top_ceps()
+        return {
+            "total_consultas": total_consultas,
+            "top_ceps": top_ceps
+        }
+
+
     @cache(expire=CACHE_EXPIRE, key_builder=cep_key_builder)
-    async def consultar(self, cep: str, background_tasks):
+    async def consultar(self, cep: str, background_tasks) -> dict:
+        """
+        Consulta o CEP.
+        """
         cep = re.sub(r"\D", "", cep)
 
         cep_data = self.db.get_cep(cep)

@@ -37,12 +37,26 @@ brasilapi = BrasilAPI()
 cep_service = CEPService(db, viacep, brasilapi)
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse, tags=["Index"])
 async def index(request: Request):
     return templates.TemplateResponse("pages/index.html", {"request": request, "title": "PyCEP"})
 
 
-@app.get("/cep/{cep}")
+@app.get("/cep/{cep}", tags=["Api"])
 async def consulta_cep(cep: CEP, background_tasks: BackgroundTasks):
     background_tasks.add_task(cep_service.incrementar_uso, cep)
     return await cep_service.consultar(cep, background_tasks)
+
+
+@app.get("/admin/dashboard", response_class=HTMLResponse, tags=["Admin"])
+async def admin_dashboard(request: Request):
+    dashboard_data = await cep_service.get_dashboard()
+    return templates.TemplateResponse(
+        "pages/admin/dashboard.html",
+        {
+            "request": request,
+            "title": "Dashboard",
+            "total_consultas": dashboard_data['total_consultas'],
+            "top_ceps": dashboard_data['top_ceps']
+        }
+    )

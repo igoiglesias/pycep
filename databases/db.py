@@ -14,7 +14,7 @@ def initialize_db(db_path=DB_PATH):
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS cep (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            cep TEXT NOT NULL,
+            cep TEXT NOT NULL UNIQUE,
             logradouro TEXT,
             complemento TEXT,
             unidade TEXT,
@@ -32,6 +32,7 @@ def initialize_db(db_path=DB_PATH):
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+    cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_cep ON cep(cep);")
     cursor.execute("DROP TRIGGER IF EXISTS cep_updated_at_trigger;")
     cursor.execute('''
         CREATE TRIGGER cep_updated_at_trigger
@@ -125,3 +126,13 @@ def update_cep(cep_data):
     ))
     cursor.connection.commit()
     cursor.connection.close()
+
+def get_total_consultas():
+    cursor = get_db_connection()
+    cursor.execute('SELECT sum(usage_count) as total FROM cep')
+    return cursor.fetchone()
+
+def get_top_ceps():
+    cursor = get_db_connection()
+    cursor.execute('SELECT cep, usage_count FROM cep ORDER BY usage_count DESC LIMIT 5')
+    return cursor.fetchall()
