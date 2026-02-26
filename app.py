@@ -1,6 +1,6 @@
-from typing import AsyncIterator
+from typing import AsyncIterator, Annotated
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, BackgroundTasks
+from fastapi import FastAPI, Request, BackgroundTasks, Form, Response
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -11,6 +11,7 @@ from modules.viacep import ViaCEP
 from modules.brasilapi import BrasilAPI
 from tools.validators import CEP
 from services.cep import CEP as CEPService
+from services.admin import Admin as AdminService
 from databases import db
 from config.config import CACHE_PREFIX, CACHE_ENABLE
 
@@ -35,6 +36,7 @@ templates = Jinja2Templates(directory="templates")
 viacep = ViaCEP()
 brasilapi = BrasilAPI()
 cep_service = CEPService(db, viacep, brasilapi)
+admin_service = AdminService(db)
 
 
 @app.get("/", response_class=HTMLResponse, tags=["Index"])
@@ -46,6 +48,16 @@ async def index(request: Request):
 async def consulta_cep(cep: CEP, background_tasks: BackgroundTasks):
     background_tasks.add_task(cep_service.incrementar_uso, cep)
     return await cep_service.consultar(cep, background_tasks)
+
+
+@app.get("/admin/login", response_class=HTMLResponse, tags=["Admin"])
+async def admin_login(request: Request):
+    return templates.TemplateResponse("pages/admin/login.html", {"request": request, "title": "Admin Login"})
+
+
+@app.post("/admin/login/")
+async def login( response: Response ,username: Annotated[str, Form()], password: Annotated[str, Form()]):
+    await admin_service.login(username, password, response)
 
 
 @app.get("/admin/dashboard", response_class=HTMLResponse, tags=["Admin"])

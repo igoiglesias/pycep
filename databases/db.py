@@ -44,6 +44,16 @@ def initialize_db(db_path=DB_PATH):
             WHERE id = OLD.id;
         END;
     ''')
+    
+    cursor.execute('''CREATE TABLE IF NOT EXISTS admin (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        email TEXT NOT NULL UNIQUE, 
+        password TEXT NOT NULL,
+        active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+    cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_admin ON admin(email);")
+    
     cursor.connection.commit()
     cursor.connection.close()
 
@@ -136,3 +146,9 @@ def get_top_ceps():
     cursor = get_db_connection()
     cursor.execute('SELECT cep, usage_count FROM cep ORDER BY usage_count DESC LIMIT 5')
     return cursor.fetchall()
+
+
+def get_admin(email):
+    cursor = get_db_connection()
+    cursor.execute('SELECT id, email, password FROM admin WHERE email = ? and active = 1', (email,))
+    return cursor.fetchone()
