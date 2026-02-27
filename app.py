@@ -10,6 +10,7 @@ from fastapi_cache.backends.inmemory import InMemoryBackend
 from modules.viacep import ViaCEP
 from modules.brasilapi import BrasilAPI
 from tools.validators import CEP
+from tools.auth import auth
 from services.cep import CEP as CEPService
 from services.admin import Admin as AdminService
 from databases import db
@@ -56,11 +57,12 @@ async def admin_login(request: Request):
 
 
 @app.post("/admin/login/")
-async def login( response: Response ,username: Annotated[str, Form()], password: Annotated[str, Form()]):
-    await admin_service.login(username, password, response)
+async def login(username: Annotated[str, Form()], password: Annotated[str, Form()]):
+    return await admin_service.login(username, password)
 
 
 @app.get("/admin/dashboard", response_class=HTMLResponse, tags=["Admin"])
+@auth
 async def admin_dashboard(request: Request):
     dashboard_data = await cep_service.get_dashboard()
     return templates.TemplateResponse(
