@@ -2,6 +2,7 @@ from config import config
 from tools.token_handler import create_token
 from fastapi.responses import RedirectResponse
 from tools.password import Password
+from tools.session_error import set_session_error
 
 
 class Admin:
@@ -16,6 +17,7 @@ class Admin:
         admin = self.db.get_admin(username)
         if not admin or not self.password.verify(password, admin['password']):
             response.headers['location'] = "/admin/login"
+            set_session_error(response, "Credenciais inválidas")
             return response
 
         jwt_token = create_token(admin['id'])

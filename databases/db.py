@@ -46,13 +46,27 @@ def initialize_db(db_path=DB_PATH):
     ''')
     
     cursor.execute('''CREATE TABLE IF NOT EXISTS admin (
-        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
         email TEXT NOT NULL UNIQUE, 
         password TEXT NOT NULL,
         active INTEGER DEFAULT 1,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
     cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_admin ON admin(email);")
+    
+    cursor.execute("""CREATE TABLE IF NOT EXISTS request_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cep TEXT NOT NULL,
+        ip TEXT NOT NULL,
+        user_agent TEXT,
+        user_token TEXT,
+        user_id INTEGER,
+        error INTEGER DEFAULT 0,
+        error_message TEXT,
+        response_time FLOAT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )""")
     
     cursor.connection.commit()
     cursor.connection.close()
@@ -152,3 +166,28 @@ def get_admin(email):
     cursor = get_db_connection()
     cursor.execute('SELECT id, email, password FROM admin WHERE email = ? and active = 1', (email,))
     return cursor.fetchone()
+
+
+def get_admin_by_id(admin_id):
+    cursor = get_db_connection()
+    cursor.execute('SELECT id, email, name FROM admin WHERE id = ? and active = 1', (admin_id,))
+    return cursor.fetchone()
+
+
+def save_request_log(cep, ip, user_agent, user_token, user_id, error, error_message, response_time):
+    cursor = get_db_connection()
+    cursor.execute('''
+        INSERT INTO request_log (cep, ip, user_agent, user_token, user_id, error, error_message, response_time)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        cep,
+        ip,
+        user_agent,
+        user_token,
+        user_id,
+        error,
+        error_message,
+        response_time
+    ))
+    cursor.connection.commit()
+    cursor.connection.close()

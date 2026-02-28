@@ -2,42 +2,50 @@
 
 {% block content %}
 <main>
-    <section>
-        <article>
-            <h2>Total de Consultas</h2>
-            <p>O volume geral de pesquisas realizadas até o momento é de:</p>
-            <h3><mark>{{ total_consultas.total }}</mark></h3>
-        </article>
-    </section>
-
-    <section>
-        <h2>Top 5 CEPs Mais Consultados</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; align-items: start;">
         
-        {% if top_ceps %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Posição</th>
-                        <th>CEP</th>
-                        <th>Consultas</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in top_ceps %}
-                    <tr>
-                        <td>{{ loop.index }}º</td> 
-                        <td><strong>{{ item.cep }}</strong></td>
-                        <td>{{ item.usage_count }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <aside>
-                <p>Ainda não há consultas registradas na plataforma.</p>
-            </aside>
-        {% endif %}
-    </section>
+        <section>
+            <article>
+                <header>
+                    <h2>Total de Consultas</h2>
+                </header>
+                <p><small>O volume geral de pesquisas realizadas até o momento é de:</small></p>
+                <h1><mark>{{ total_consultas.total }}</mark></h1>
+            </article>
+        </section>
+
+        <section>
+            <h2>Top 5 CEPs</h2>
+            <p><small>Ranking dos códigos postais mais buscados.</small></p>
+            
+            {% if top_ceps %}
+                <table>
+                    <caption>Distribuição das regiões mais buscadas</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Posição</th>
+                            <th scope="col">CEP</th>
+                            <th scope="col">Consultas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in top_ceps %}
+                        <tr>
+                            <td scope="row">{{ loop.index }}º</td> 
+                            <td><code>{{ item.cep }}</code></td>
+                            <td>{{ item.usage_count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <blockquote>
+                    <p><strong>Aviso:</strong> Ainda não há consultas registradas na plataforma.</p>
+                </blockquote>
+            {% endif %}
+        </section>
+
+    </div>
 </main>
 {% endblock %}
 
