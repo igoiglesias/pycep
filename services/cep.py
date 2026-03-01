@@ -49,18 +49,14 @@ class CEP:
         background_tasks.add_task(self.__salvar, cep_data['content'])
 
         return cep_data
-
-    async def incrementar_uso(self, cep: str) -> None:
-        """
-        Incrementa o contador de uso do CEP.
-        """
-        self.db.incrementar_uso(cep)
-
+    
+    
     async def __salvar(self, cep_data: dict) -> None:
         """
         Salva o CEP no banco de dados.
         """
         self.db.save_cep(cep_data)
+    
     
     async def __atualizar(self, cep: str) -> None:
         """

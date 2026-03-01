@@ -53,7 +53,6 @@ async def index(request: Request):
 @app.get("/cep/{cep}", tags=["Api"])
 @log_service.cep_request
 async def consulta_cep(request: Request, cep: CEP, background_tasks: BackgroundTasks):
-    background_tasks.add_task(cep_service.incrementar_uso, cep)
     return await cep_service.consultar(cep, background_tasks)
 
 

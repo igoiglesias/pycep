@@ -1,6 +1,7 @@
 import sqlite3
 from config.config import DB_PATH, DAYS_TO_UPDATE
 from datetime import datetime, timedelta, timezone
+from tools.password import Password
 
 
 def get_db_connection(db_path=DB_PATH):
@@ -10,6 +11,7 @@ def get_db_connection(db_path=DB_PATH):
 
 
 def initialize_db(db_path=DB_PATH):
+    password = Password()
     cursor = get_db_connection(db_path)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS cep (
@@ -27,7 +29,7 @@ def initialize_db(db_path=DB_PATH):
             gia TEXT,
             ddd TEXT,
             siafi TEXT,
-            usage_count INTEGER DEFAULT 1,
+            usage_count INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -54,6 +56,8 @@ def initialize_db(db_path=DB_PATH):
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
     cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_admin ON admin(email);")
+    admin_pwd = password.hash('admin')
+    cursor.execute("INSERT OR IGNORE INTO admin (name, email, password) VALUES ('Admin', 'admin@pycep.com', ?)", (admin_pwd,))
     
     cursor.execute("""CREATE TABLE IF NOT EXISTS request_log (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
