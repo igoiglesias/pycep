@@ -2,8 +2,6 @@ import functools
 import asyncio
 import time
 from fastapi import Request
-from starlette.background import BackgroundTask
-
 
 
 class log:

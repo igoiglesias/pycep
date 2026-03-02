@@ -59,6 +59,20 @@ def initialize_db(db_path=DB_PATH):
     admin_pwd = password.hash('admin')
     cursor.execute("INSERT OR IGNORE INTO admin (name, email, password) VALUES ('Admin', 'admin@pycep.com', ?)", (admin_pwd,))
     
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE, 
+            password TEXT NOT NULL,
+            active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_user ON user(email);")
+    user_pwd = password.hash('user')
+    cursor.execute("INSERT OR IGNORE INTO user (name, email, password) VALUES ('User', 'user@pycep.com', ?)", (user_pwd,))
+    
     cursor.execute("""CREATE TABLE IF NOT EXISTS request_log (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         cep TEXT NOT NULL,

@@ -15,7 +15,7 @@ class Auth:
         @functools.wraps(func)
         async def wrapper(request: Request, *args, **kwargs):
             response = RedirectResponse(url="/admin/login", status_code=302)
-            jwt_token = request.cookies.get(config.COOKIE_NAME)
+            jwt_token = request.cookies.get(config.ADMIN_COOKIE_NAME)
             if not jwt_token:
                 set_session_error(response, "Sessão expirada")
                 return response
@@ -27,7 +27,7 @@ class Auth:
             
             user = self.db.get_admin_by_id(decoded_token.get("sub"))
             if not user:
-                response.delete_cookie(config.COOKIE_NAME)
+                response.delete_cookie(config.ADMIN_COOKIE_NAME)
                 set_session_error(response, "Usuário não encontrado")
                 return response
 

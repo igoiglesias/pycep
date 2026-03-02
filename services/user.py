@@ -5,14 +5,14 @@ from tools.password import Password
 from tools.session_error import set_session_error
 
 
-class Admin:
+class User:
     def __init__(self, db):
         self.db = db
         self.password = Password()
     
     
     async def login(self, username: str, password: str):
-        """Faz login do admin."""
+        """Faz login do Usuário."""
         response = RedirectResponse(url="/admin/dashboard", status_code=302)
         admin = self.db.get_admin(username)
         if not admin or not self.password.verify(password, admin['password']):
