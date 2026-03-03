@@ -10,8 +10,8 @@
 
 <header>
     <nav>
-        <a href="dashboard" class="current">Dashboard</a>
-        <a href="logout">Sair</a>
+        <a href="{{ url_for('admin_dashboard') }}" class="current">Dashboard</a>
+        <a href="{{ url_for('admin_logout') }}">Sair</a>
     </nav>
     <h1>Bem vindo, {{ user['name'] }}</h1>
     <p>Acompanhe o volume de pesquisas de CEP na plataforma.

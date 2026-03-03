@@ -1,3 +1,4 @@
+import re
 import functools
 import asyncio
 import time
@@ -12,10 +13,11 @@ class log:
         @functools.wraps(func)
         async def wrapper(request: Request, *args, **kwargs):
             inicio = time.perf_counter()
+            kwargs['cep'] = re.sub(r"\D", "", kwargs.get("cep"))
             response = await func(request, *args, **kwargs)
             fim = time.perf_counter()
             exec_time = (fim - inicio) * 1000
-
+            
             data_to_log = {
                 "cep": kwargs.get("cep"),
                 "ip": self.__pegar_ip_real(request),

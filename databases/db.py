@@ -186,9 +186,21 @@ def get_admin(email):
     return cursor.fetchone()
 
 
+def get_user(email):
+    cursor = get_db_connection()
+    cursor.execute('SELECT id, email, password FROM user WHERE email = ? and active = 1', (email,))
+    return cursor.fetchone()
+
+
 def get_admin_by_id(admin_id):
     cursor = get_db_connection()
     cursor.execute('SELECT id, email, name FROM admin WHERE id = ? and active = 1', (admin_id,))
+    return cursor.fetchone()
+
+
+def get_user_by_id(user_id):
+    cursor = get_db_connection()
+    cursor.execute('SELECT id, email, name FROM user WHERE id = ? and active = 1', (user_id,))
     return cursor.fetchone()
 
 

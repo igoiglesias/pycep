@@ -1,4 +1,3 @@
-import re
 from fastapi_cache.decorator import cache
 from config.config import CACHE_EXPIRE
 from tools.key_builders import cep_key_builder
@@ -28,15 +27,13 @@ class CEP:
         """
         Consulta o CEP.
         """
-        cep = re.sub(r"\D", "", cep)
-
         cep_data = self.db.get_cep(cep)
         if cep_data:
             background_tasks.add_task(self.__atualizar, cep)
             return {
                 "erro": False,
                 "mensagem": None,
-                "content": cep_data
+                "content": dict(cep_data)
             }
 
         cep_data = await self.viacep.consultar(cep)

@@ -9,6 +9,10 @@
 <body>
 
 <header>
+    <nav>
+        <a href="{{ url_for('user_dashboard') }}" class="current">Dashboard</a>
+        <a href="{{ url_for('user_logout') }}">Sair</a>
+    </nav>
     <h1>Consultar CEP</h1>
     <p>Consulta rápida de endereço via API interna.</p>
 </header>

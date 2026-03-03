@@ -53,6 +53,7 @@ async def index(request: Request):
 
 
 @app.get("/dashboard", include_in_schema=False, tags=["Index"])
+@auth_service.verify(perfil="user")
 async def user_dashboard(request: Request):
     return templates.TemplateResponse(
         "pages/dashboard.html", 
@@ -78,7 +79,7 @@ async def user_login(request: Request):
 
 @app.post("/login", include_in_schema=False, tags=["Index"])
 async def user_post_login(username: Annotated[str, Form()], password: Annotated[str, Form()]):
-    return await user_service.login(username, password)
+    return await auth_service.login(username, password, perfil="user")
 
 
 @app.get("/logout", include_in_schema=False, tags=["Index"])
@@ -112,18 +113,18 @@ async def admin_login(request: Request):
 
 @app.post("/admin/login/", include_in_schema=False, tags=["Admin"])
 async def login(username: Annotated[str, Form()], password: Annotated[str, Form()]):
-    return await admin_service.login(username, password)
+    return await auth_service.login(username, password, perfil="admin")
 
 
 @app.get("/admin/logout", include_in_schema=False, tags=["Admin"])
-async def logout(request: Request):
+async def admin_logout(request: Request):
     response = RedirectResponse(url="/admin/login", status_code=303)
     response.delete_cookie(config.ADMIN_COOKIE_NAME)
     return response
 
 
 @app.get("/admin/dashboard", response_class=HTMLResponse, include_in_schema=False, tags=["Admin"])
-@auth_service.verify_admin
+@auth_service.verify(perfil="admin")
 async def admin_dashboard(request: Request):
     user = request.state.user
     dashboard_data = await cep_service.get_dashboard()
