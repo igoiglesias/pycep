@@ -56,8 +56,6 @@ def initialize_db(db_path=DB_PATH):
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
     cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_admin ON admin(email);")
-    admin_pwd = password.hash('admin')
-    cursor.execute("INSERT OR IGNORE INTO admin (name, email, password) VALUES ('Admin', 'admin@pycep.com', ?)", (admin_pwd,))
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS user (
@@ -70,8 +68,6 @@ def initialize_db(db_path=DB_PATH):
         )
     ''')
     cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_user ON user(email);")
-    user_pwd = password.hash('user')
-    cursor.execute("INSERT OR IGNORE INTO user (name, email, password) VALUES ('User', 'user@pycep.com', ?)", (user_pwd,))
     
     cursor.execute("""CREATE TABLE IF NOT EXISTS request_log (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

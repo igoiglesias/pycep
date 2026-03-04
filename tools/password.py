@@ -1,5 +1,6 @@
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+from config.config import ARGON2_SALT
 
 
 class Password:
@@ -8,7 +9,7 @@ class Password:
         self.ph = PasswordHasher()
     
     def hash(self, password: str) -> str:
-        return self.ph.hash(password)
+        return self.ph.hash(password, salt=ARGON2_SALT.encode("utf-8"))
     
     def verify(self, password: str, hash: str) -> bool:
         try:
