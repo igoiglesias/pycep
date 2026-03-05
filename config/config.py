@@ -1,6 +1,3 @@
-from pickle import TRUE
-
-
 VIACEP_URL = "https://viacep.com.br/ws"
 BRASILAPI_URL = "https://brasilapi.com.br/api"
 
@@ -15,9 +12,9 @@ DAYS_TO_UPDATE = 30
 USER_COOKIE_NAME = "user_auth"
 ADMIN_COOKIE_NAME = "admin_auth"
 COOKIE_DOMAIN = "localhost"
-COOKIE_HTTPONLY = TRUE
+COOKIE_HTTPONLY = True
 COOKIE_SAMESITE = "lax"
-COOKIE_SECURE = TRUE
+COOKIE_SECURE = True
 COOKIE_MAX_AGE = 60
 
 JWT_SECRET = "6ea56ab82f19a18350d255696f9060b77204d9d427ce5c31910f04115b61a604"
