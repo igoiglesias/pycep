@@ -1,10 +1,15 @@
-import requests
 from config.config import BRASILAPI_URL
+import httpx
 
 
 class BrasilAPI:
     def __init__(self):
         self.base_url = BRASILAPI_URL
+        self.client = httpx.AsyncClient(
+            timeout=60.0,
+            http2=True,
+            base_url=self.base_url
+        )
         self.states = {
             "AC": "Acre",
             "AL": "Alagoas",
@@ -36,11 +41,11 @@ class BrasilAPI:
         }
 
     async def consultar_cep(self, cep: str) -> dict:
-        url = f"{self.base_url}/cep/v2/{cep}"
+        url = f"/cep/v2/{cep}"
         try:
-            response = requests.get(url)
+            response = await self.client.get(url)
         except Exception as e:
-            print(f"Erro ao consultar CEP({cep}): {e}")
+            print(f"Erro ao consultar CEP no BasilAPI({cep}): {str(e)}")
             return {
                 "erro": True,
                 "mensagem": "Erro ao consultar CEP",

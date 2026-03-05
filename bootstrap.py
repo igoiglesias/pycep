@@ -8,6 +8,7 @@ from fastapi_cache.backends.inmemory import InMemoryBackend
 
 from databases import db
 from config import config
+import httpx
 
 
 db.initialize_db()

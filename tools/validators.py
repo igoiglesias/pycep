@@ -27,5 +27,5 @@ class CEP_RESPONSE(BaseModel):
     """
     erro: bool
     mensagem: str | None
-    content: CEP_CONTENT
+    content: CEP_CONTENT | None
     

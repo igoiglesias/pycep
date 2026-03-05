@@ -3,3 +3,5 @@ requests
 fastapi-cache2
 PyJWT
 argon2-cffi
+locust
+httpx[http2]

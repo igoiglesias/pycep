@@ -1,7 +1,6 @@
 import sqlite3
 from config.config import DB_PATH, DAYS_TO_UPDATE
 from datetime import datetime, timedelta, timezone
-from tools.password import Password
 
 
 def get_db_connection(db_path=DB_PATH):
@@ -11,7 +10,6 @@ def get_db_connection(db_path=DB_PATH):
 
 
 def initialize_db(db_path=DB_PATH):
-    password = Password()
     cursor = get_db_connection(db_path)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS cep (

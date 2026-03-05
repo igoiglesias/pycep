@@ -17,7 +17,6 @@ class log:
             response = await func(request, *args, **kwargs)
             fim = time.perf_counter()
             exec_time = (fim - inicio) * 1000
-            
             data_to_log = {
                 "cep": kwargs.get("cep"),
                 "ip": self.__pegar_ip_real(request),
@@ -28,6 +27,7 @@ class log:
                 "user_token": request.headers.get("authorization"),
                 "user_id": None
             }
+
             asyncio.create_task(self.__log_request(data_to_log))
             asyncio.create_task(self.__incrementar_uso(kwargs.get("cep")))
 

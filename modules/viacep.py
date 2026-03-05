@@ -1,17 +1,22 @@
-import requests
 from config.config import VIACEP_URL
+import httpx
 
 
 class ViaCEP:
     def __init__(self):
         self.base_url = VIACEP_URL
+        self.client = httpx.AsyncClient(
+            timeout=60.0,
+            http2=True,
+            base_url=self.base_url
+        )
     
     async def consultar(self, cep: str) -> dict:
-        url = f"{self.base_url}/{cep}/json/"
+        url = f"/{cep}/json/"
         try:
-            response = requests.get(url)
+            response = await self.client.get(url)
         except Exception as e:
-            print(f"Erro ao consultar CEP({cep}): {e}")
+            print(f"Erro ao consultar CEP no ViaCEP({cep}): {str(e)}")
             return {
                 "erro": True,
                 "mensagem": "Erro ao consultar CEP",
