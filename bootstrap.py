@@ -10,11 +10,11 @@ from databases import db
 from config import config
 
 
-db.initialize_db()
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     FastAPICache.init(InMemoryBackend(), prefix=config.CACHE_PREFIX, enable=config.CACHE_ENABLE)
+    await db.initialize_db()
     yield
 
 app = FastAPI(

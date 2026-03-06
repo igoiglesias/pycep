@@ -14,8 +14,8 @@ class CEP:
         """
         Retorna os dados do dashboard.
         """
-        total_consultas = self.db.get_total_consultas()
-        top_ceps = self.db.get_top_ceps()
+        total_consultas = await self.db.get_total_consultas()
+        top_ceps = await self.db.get_top_ceps()
         return {
             "total_consultas": total_consultas,
             "top_ceps": top_ceps
@@ -27,7 +27,7 @@ class CEP:
         """
         Consulta o CEP.
         """
-        cep_data = self.db.get_cep(cep)
+        cep_data = await self.db.get_cep(cep)
         if cep_data:
             background_tasks.add_task(self.__atualizar, cep)
             return {
@@ -52,14 +52,14 @@ class CEP:
         """
         Salva o CEP no banco de dados.
         """
-        self.db.save_cep(cep_data)
+        await self.db.save_cep(cep_data)
     
     
     async def __atualizar(self, cep: str) -> None:
         """
         Atualiza o CEP no banco de dados.
         """
-        if not self.db.has_to_update(cep):
+        if not await self.db.has_to_update(cep):
             return
 
         cep_data = await self.viacep.consultar(cep)
@@ -67,5 +67,5 @@ class CEP:
             return
 
         cep_data['content']['cep'] = cep
-        self.db.update_cep(cep_data['content'])
+        await self.db.update_cep(cep_data['content'])
         

@@ -39,10 +39,10 @@ class log:
         """
         Incrementa o contador de uso do CEP.
         """
-        self.db.incrementar_uso(cep)
+        await self.db.incrementar_uso(cep)
     
     async def __log_request(self, data_to_log):
-        self.db.save_request_log(**data_to_log)
+        await self.db.save_request_log(**data_to_log)
     
     
     def __pegar_ip_real(self,request: Request):

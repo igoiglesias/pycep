@@ -8,7 +8,8 @@ class BrasilAPI:
         self.client = httpx.AsyncClient(
             timeout=60.0,
             http2=True,
-            base_url=self.base_url
+            base_url=self.base_url,
+            limits=httpx.Limits(max_keepalive_connections=2, max_connections=6)
         )
         self.states = {
             "AC": "Acre",

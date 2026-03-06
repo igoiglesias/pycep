@@ -34,9 +34,9 @@ class Auth:
                     set_session_error(response, "Token inválido")
                     return response
 
-                user = self.db.get_user_by_id(decoded_token.get("sub"))
+                user = await self.db.get_user_by_id(decoded_token.get("sub"))
                 if perfil == "admin":
-                    user = self.db.get_user_by_id(decoded_token.get("sub"))
+                    user = await self.db.get_user_by_id(decoded_token.get("sub"))
                 
                 if not user:
                     response.delete_cookie(cookie_name)
@@ -58,12 +58,12 @@ class Auth:
         """Faz login do Usuário."""
         url = '/'
         cookie_name = config.USER_COOKIE_NAME
-        user = self.db.get_user(username)
+        user = await self.db.get_user(username)
 
         if perfil == "admin":
             url = "/admin/"
             cookie_name = config.ADMIN_COOKIE_NAME
-            user = self.db.get_admin(username)
+            user = await self.db.get_admin(username)
 
         response = RedirectResponse(url=f"{url}dashboard", status_code=302)
         if not user or not self.password.verify(password, user['password']):
