@@ -1,24 +1,29 @@
-VIACEP_URL = "https://viacep.com.br/ws"
-BRASILAPI_URL = "https://brasilapi.com.br/api"
+import os 
+from dotenv import load_dotenv
 
-DB_PATH = "databases/database.db"
 
-CACHE_ENABLE = True
-CACHE_EXPIRE = 60
-CACHE_PREFIX = "pycep"
+load_dotenv()
 
-DAYS_TO_UPDATE = 30
 
-USER_COOKIE_NAME = "user_auth"
-ADMIN_COOKIE_NAME = "admin_auth"
-COOKIE_DOMAIN = "localhost"
-COOKIE_HTTPONLY = True
-COOKIE_SAMESITE = "lax"
-COOKIE_SECURE = True
-COOKIE_MAX_AGE = 60
+VIACEP_URL = os.getenv("VIACEP_URL")
+BRASILAPI_URL = os.getenv("BRASILAPI_URL")
 
-JWT_SECRET = "6ea56ab82f19a18350d255696f9060b77204d9d427ce5c31910f04115b61a604"
-JWT_ALGORITHM = "HS256"
-JWT_EXPIRE_MINUTES = 3600
+DB_PATH = os.getenv("DB_PATH")
 
-ARGON2_SALT = "71ef4fb645a206bf1da824d2862dabdd6d126948b66dc04069baa72db33f830c"
+CACHE_ENABLE = os.getenv("CACHE_ENABLE") == "True"
+CACHE_EXPIRE = int(os.getenv("CACHE_EXPIRE", "3600"))
+CACHE_PREFIX = os.getenv("CACHE_PREFIX")
+
+DAYS_TO_UPDATE = int(os.getenv("DAYS_TO_UPDATE", "30"))
+
+USER_COOKIE_NAME = os.getenv("USER_COOKIE_NAME")
+ADMIN_COOKIE_NAME = os.getenv("ADMIN_COOKIE_NAME")
+COOKIE_DOMAIN = os.getenv("COOKIE_DOMAIN")
+COOKIE_HTTPONLY = os.getenv("COOKIE_HTTPONLY") == "True"
+COOKIE_SAMESITE = os.getenv("COOKIE_SAMESITE")
+COOKIE_SECURE = os.getenv("COOKIE_SECURE") == "True"
+COOKIE_MAX_AGE = int(os.getenv("COOKIE_MAX_AGE", "60"))
+
+JWT_SECRET = os.getenv("JWT_SECRET")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "3600"))

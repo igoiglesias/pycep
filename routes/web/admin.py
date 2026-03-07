@@ -4,12 +4,12 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 
 from modules.viacep import ViaCEP
 from modules.brasilapi import BrasilAPI
-from databases import db
 from config import config
 from services.cep import CEP as CEPService
 from services.admin import Admin as AdminService
 from services.auth import Auth as AuthService
-from bootstrap import templates
+from bootstrap import templates, DATABASE
+from databases.repository import Repository
 
 
 router = APIRouter(
@@ -18,11 +18,13 @@ router = APIRouter(
     include_in_schema = False
 )
 
+repo = Repository(DATABASE)
+
 viacep = ViaCEP()
 brasilapi = BrasilAPI()
-cep_service = CEPService(db, viacep, brasilapi)
-admin_service = AdminService(db)
-auth_service = AuthService(db)
+cep_service = CEPService(repo, viacep, brasilapi)
+admin_service = AdminService(repo)
+auth_service = AuthService(repo)
 
 
 

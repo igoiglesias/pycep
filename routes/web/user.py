@@ -1,9 +1,9 @@
 from typing import Annotated
 from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
-from databases import db
 from services.auth import Auth as AuthService
-from bootstrap import templates
+from bootstrap import templates, DATABASE
+from databases.repository import Repository
 from config import config
 
 
@@ -12,7 +12,9 @@ router = APIRouter(
     include_in_schema = False
 )
 
-auth_service = AuthService(db)
+repo = Repository(DATABASE)
+
+auth_service = AuthService(repo)
 
 
 @router.get("/", response_class=HTMLResponse)

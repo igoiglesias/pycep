@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Request, BackgroundTasks
 from tools.validators import CEP, CEP_RESPONSE
-from databases import db
 from modules.viacep import ViaCEP
 from modules.brasilapi import BrasilAPI
 from services.cep import CEP as CEPService
 from services.log import log as LogService
+from bootstrap import DATABASE
+from databases.repository import Repository
 
 
 router = APIRouter(
@@ -12,10 +13,12 @@ router = APIRouter(
     tags=["Api"]
 )
 
+repo = Repository(DATABASE)
+
 viacep = ViaCEP()
 brasilapi = BrasilAPI()
-cep_service = CEPService(db, viacep, brasilapi)
-log_service = LogService(db)
+cep_service = CEPService(repo, viacep, brasilapi)
+log_service = LogService(repo)
 
 
 @router.get("/{cep}", response_model=CEP_RESPONSE)
