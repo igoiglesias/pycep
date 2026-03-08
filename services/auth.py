@@ -24,7 +24,7 @@ class Auth:
                     cookie_name = config.ADMIN_COOKIE_NAME
                 
                 response = RedirectResponse(url=f"{url}login", status_code=302)
-                jwt_token = request.cookies.get(cookie_name)
+                jwt_token = request.cookies.get(cookie_name, )
                 if not jwt_token:
                     set_session_error(response, "Sessão expirada")
                     return response
@@ -36,7 +36,7 @@ class Auth:
 
                 user = await self.db.get_user_by_id(decoded_token.get("sub"))
                 if perfil == "admin":
-                    user = await self.db.get_user_by_id(decoded_token.get("sub"))
+                    user = await self.db.get_admin_by_id(decoded_token.get("sub"))
                 
                 if not user:
                     response.delete_cookie(cookie_name)

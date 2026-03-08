@@ -1,12 +1,12 @@
-from collections.abc import Iterable
+from collections.abc import Iterable, Callable
 import aiosqlite
 from datetime import datetime, timedelta, timezone
 from config.config import DAYS_TO_UPDATE
 
 
 class Repository:
-    def __init__(self, db):
-        self.db = db
+    def __init__(self, get_db: Callable):
+        self.db = get_db()
 
 
     async def initialize_db(self) -> None:
@@ -153,13 +153,13 @@ class Repository:
 
 
     async def get_total_consultas(self) -> aiosqlite.Row | None:
-        query = 'SELECT SUM(usage_count) as total_consultas FROM cep'
-        return await self.db.execute(query)
+        query = 'SELECT SUM(usage_count) as total FROM cep'
+        return await self.db.fetchone(query)
     
 
     async def get_top_ceps(self) -> Iterable[aiosqlite.Row] | None:
         query = 'SELECT cep, usage_count FROM cep ORDER BY usage_count DESC LIMIT 5'
-        return await self.db.execute(query)
+        return await self.db.fetchall(query)
 
 
     async def get_admin(self, email: str) -> aiosqlite.Row | None:
@@ -172,12 +172,12 @@ class Repository:
         return await self.db.fetchone(query, (email,))
 
     async def get_admin_by_id(self, admin_id: int) -> aiosqlite.Row | None:
-        query = 'SELECT id, email, password FROM admin WHERE id = ? and active = 1'
+        query = 'SELECT id, email, name FROM admin WHERE id = ? and active = 1'
         return await self.db.fetchone(query, (admin_id,))
 
 
     async def get_user_by_id(self, user_id: int) -> aiosqlite.Row | None:
-        query = 'SELECT id, email, password FROM user WHERE id = ? and active = 1'
+        query = 'SELECT id, email, name FROM user WHERE id = ? and active = 1'
         return await self.db.fetchone(query, (user_id,))
 
     async def save_request_log(self, cep: str, ip: str, user_agent: str, user_token: str, user_id: int, error: bool, error_message: str, response_time: float) -> None:

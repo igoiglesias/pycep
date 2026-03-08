@@ -8,7 +8,7 @@ from config import config
 from services.cep import CEP as CEPService
 from services.admin import Admin as AdminService
 from services.auth import Auth as AuthService
-from bootstrap import templates, DATABASE
+from bootstrap import templates, get_db
 from databases.repository import Repository
 
 
@@ -18,7 +18,7 @@ router = APIRouter(
     include_in_schema = False
 )
 
-repo = Repository(DATABASE)
+repo = Repository(get_db)
 
 viacep = ViaCEP()
 brasilapi = BrasilAPI()

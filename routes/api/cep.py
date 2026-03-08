@@ -4,7 +4,7 @@ from modules.viacep import ViaCEP
 from modules.brasilapi import BrasilAPI
 from services.cep import CEP as CEPService
 from services.log import log as LogService
-from bootstrap import DATABASE
+from bootstrap import get_db
 from databases.repository import Repository
 
 
@@ -13,7 +13,7 @@ router = APIRouter(
     tags=["Api"]
 )
 
-repo = Repository(DATABASE)
+repo = Repository(get_db)
 
 viacep = ViaCEP()
 brasilapi = BrasilAPI()

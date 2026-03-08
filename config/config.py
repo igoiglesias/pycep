@@ -8,16 +8,16 @@ load_dotenv()
 VIACEP_URL = os.getenv("VIACEP_URL")
 BRASILAPI_URL = os.getenv("BRASILAPI_URL")
 
-DB_PATH = os.getenv("DB_PATH")
+DB_PATH = os.getenv("DB_PATH", "")
 
 CACHE_ENABLE = os.getenv("CACHE_ENABLE") == "True"
 CACHE_EXPIRE = int(os.getenv("CACHE_EXPIRE", "3600"))
-CACHE_PREFIX = os.getenv("CACHE_PREFIX")
+CACHE_PREFIX = os.getenv("CACHE_PREFIX", "")
 
 DAYS_TO_UPDATE = int(os.getenv("DAYS_TO_UPDATE", "30"))
 
-USER_COOKIE_NAME = os.getenv("USER_COOKIE_NAME")
-ADMIN_COOKIE_NAME = os.getenv("ADMIN_COOKIE_NAME")
+USER_COOKIE_NAME = os.getenv("USER_COOKIE_NAME", "")
+ADMIN_COOKIE_NAME = os.getenv("ADMIN_COOKIE_NAME", "")
 COOKIE_DOMAIN = os.getenv("COOKIE_DOMAIN")
 COOKIE_HTTPONLY = os.getenv("COOKIE_HTTPONLY") == "True"
 COOKIE_SAMESITE = os.getenv("COOKIE_SAMESITE")
