@@ -1,7 +1,7 @@
 from collections.abc import Iterable, Callable
 import aiosqlite
 from datetime import datetime, timedelta, timezone
-from config.config import DAYS_TO_UPDATE
+from config.config import DAYS_TO_UPDATE, TENTATIVAS_TO_UPDATE
 
 
 class Repository:
@@ -79,6 +79,29 @@ class Repository:
             response_time FLOAT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )""")
+        
+        await self.db.execute("""CREATE TABLE IF NOT EXISTS fila_update (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            cep TEXT NOT NULL UNIQUE,
+            status TEXT NOT NULL DEFAULT 'pending',
+            request_log TEXT,
+            tentativas INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );""")
+        
+        await self.db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_fila_update_cep ON fila_update(cep);")
+        await self.db.execute("DROP TRIGGER IF EXISTS fila_updated_at_trigger;")
+        await self.db.execute('''
+            CREATE TRIGGER fila_updated_at_trigger
+            AFTER UPDATE ON fila_update
+            FOR EACH ROW
+            BEGIN
+                UPDATE fila_update
+                SET updated_at = CURRENT_TIMESTAMP
+                WHERE id = OLD.id;
+            END;
+        ''')
 
 
     async def incrementar_uso(self, cep: str):
@@ -171,6 +194,7 @@ class Repository:
         query = 'SELECT id, email, password FROM user WHERE email = ? and active = 1'
         return await self.db.fetchone(query, (email,))
 
+
     async def get_admin_by_id(self, admin_id: int) -> aiosqlite.Row | None:
         query = 'SELECT id, email, name FROM admin WHERE id = ? and active = 1'
         return await self.db.fetchone(query, (admin_id,))
@@ -179,6 +203,7 @@ class Repository:
     async def get_user_by_id(self, user_id: int) -> aiosqlite.Row | None:
         query = 'SELECT id, email, name FROM user WHERE id = ? and active = 1'
         return await self.db.fetchone(query, (user_id,))
+
 
     async def save_request_log(self, cep: str, ip: str, user_agent: str, user_token: str, user_id: int, error: bool, error_message: str, response_time: float) -> None:
         query = '''
@@ -195,3 +220,47 @@ class Repository:
             error_message,
             response_time
         ))
+    
+    
+    async def add_to_fila_update(self, cep: str) -> None:
+        query = '''
+            INSERT INTO fila_update (cep)
+            VALUES (?);
+        '''
+        await self.db.execute(query, (cep,))
+    
+
+    async def get_fila_update(self) -> Iterable[aiosqlite.Row] | None:
+        query = '''
+            SELECT id, cep, tentativas FROM fila_update
+            WHERE status = 'pending' and tentativas <= ?
+            ORDER BY created_at ASC
+            LIMIT 10;
+        '''
+        return await self.db.fetchall(query, (TENTATIVAS_TO_UPDATE,))
+    
+    
+    async def remove_from_fila_update(self, cep: str) -> None:
+        query = '''
+            DELETE FROM fila_update
+            WHERE cep = ?;
+        '''
+        await self.db.execute(query, (cep,))
+
+
+    async def increment_update_attempts(self, cep: str) -> None:
+        query = '''
+            UPDATE fila_update
+            SET tentativas = tentativas + 1
+            WHERE cep = ?;
+        '''
+        await self.db.execute(query, (cep,))
+    
+
+    async def set_error_fila_update(self, cep: str) -> None:
+        query = '''
+            UPDATE fila_update
+            SET status = 'error'
+            WHERE cep = ?;
+        '''
+        await self.db.execute(query, (cep,))    

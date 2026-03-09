@@ -15,6 +15,7 @@ CACHE_EXPIRE = int(os.getenv("CACHE_EXPIRE", "3600"))
 CACHE_PREFIX = os.getenv("CACHE_PREFIX", "")
 
 DAYS_TO_UPDATE = int(os.getenv("DAYS_TO_UPDATE", "30"))
+TENTATIVAS_TO_UPDATE = int(os.getenv("TENTATIVAS_TO_UPDATE", "3"))
 
 USER_COOKIE_NAME = os.getenv("USER_COOKIE_NAME", "")
 ADMIN_COOKIE_NAME = os.getenv("ADMIN_COOKIE_NAME", "")

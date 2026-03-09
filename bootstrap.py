@@ -8,6 +8,7 @@ from fastapi_cache.backends.inmemory import InMemoryBackend
 
 from databases.db import DB
 from config import config
+from databases.repository import Repository
 
 
 db = DB(config.DB_PATH)
@@ -15,10 +16,13 @@ db = DB(config.DB_PATH)
 def get_db():
     return db
 
+repo = Repository(get_db)
+
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     FastAPICache.init(InMemoryBackend(), prefix=config.CACHE_PREFIX, enable=config.CACHE_ENABLE)
     await db.connect()
+    await repo.initialize_db()
     yield
     await db.disconnect()
 

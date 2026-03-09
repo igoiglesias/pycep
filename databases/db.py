@@ -5,7 +5,8 @@ import aiosqlite
 class DB:
     def __init__(self, db_path="databases.db") -> None:
         self.db_path = db_path
-        self.db: aiosqlite.Connection
+        self.db: aiosqlite.Connection | None = None
+
     async def disconnect(self) -> None:
         if self.db:
             await self.db.close()

@@ -1,30 +1,36 @@
-from databases.db import get_db_connection
+import asyncio
 from tools.password import Password
+from databases.db import DB
+from config import config
 
 
-def main():
 
-    cursor = get_db_connection()
+
+async def main():
+    db = DB(config.DB_PATH)
+    await db.connect()
     
-    create_request_logs(cursor)
-    create_users(cursor)
+    await create_users(db)
+    await create_request_logs(db)
     
-    cursor.connection.close()
-    
-
+    await db.disconnect()
     
 
-def create_users(cursor):
+    
+
+async def create_users(db):
     password = Password()
+
     admin_pwd = password.hash('admin')
-    cursor.execute("INSERT OR IGNORE INTO admin (name, email, password) VALUES ('Admin', 'admin@pycep.com', ?)", (admin_pwd,))
+    admin_query = "INSERT OR IGNORE INTO admin (name, email, password) VALUES ('Admin', 'admin@pycep.com', ?)"
+    await db.execute(admin_query, (admin_pwd,))
     
     user_pwd = password.hash('user')
-    cursor.execute("INSERT OR IGNORE INTO user (name, email, password) VALUES ('User', 'user@pycep.com', ?)", (user_pwd,))
+    user_query = "INSERT OR IGNORE INTO user (name, email, password) VALUES ('User', 'user@pycep.com', ?)"
+    await db.execute(user_query, (user_pwd,))
 
-    cursor.connection.commit()
 
-def create_request_logs(cursor):
+async def create_request_logs(db):
     request_data = [
         # --- MÊS 1: NOVEMBRO 2025 ---
         ('01310-100', '189.34.102.5', 'Mozilla/5.0 (Windows NT 10.0)', 'tok_nov_001', 101, 0, None, 0.125, '2025-11-01 09:15:22'),
@@ -102,11 +108,9 @@ def create_request_logs(cursor):
     """
 
     for request in request_data:
-        cursor.execute(sql, request)
-
-    cursor.connection.commit()
+        await db.execute(sql, request)
 
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
