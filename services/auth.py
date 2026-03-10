@@ -5,15 +5,23 @@ from config import config
 from tools.token_handler import decode_token, create_token
 from tools.session_error import set_session_error
 from tools.password import Password
+from tools.validators import PERFIL
+
+
 
 
 
 class Auth:
-    def __init__(self, db):
-        self.db = db
+    def __init__(self, repo):
+        self.repo = repo
         self.password = Password()
 
-    def verify(self, perfil="user"):
+    def verify(self, perfil: PERFIL="user"):
+        """
+        Decorator para verificar se o usuário está autenticado e tem o perfil correto.
+        Redireciona para a página de login se a autenticação falhar.
+        """
+
         def decorator(func):
             @functools.wraps(func)
             async def wrapper(request: Request, *args, **kwargs):
@@ -34,9 +42,10 @@ class Auth:
                     set_session_error(response, "Token inválido")
                     return response
 
-                user = await self.db.get_user_by_id(decoded_token.get("sub"))
                 if perfil == "admin":
-                    user = await self.db.get_admin_by_id(decoded_token.get("sub"))
+                    user = await self.repo.get_admin_by_id(decoded_token.get("sub"))
+                else:
+                    user = await self.repo.get_user_by_id(decoded_token.get("sub"))
                 
                 if not user:
                     response.delete_cookie(cookie_name)
@@ -54,16 +63,16 @@ class Auth:
         return decorator
 
 
-    async def login(self, username: str, password: str, perfil: str = "user"):
+    async def login(self, username: str, password: str, perfil: str = "user") -> RedirectResponse:
         """Faz login do Usuário."""
         url = '/'
         cookie_name = config.USER_COOKIE_NAME
-        user = await self.db.get_user(username)
+        user = await self.repo.get_user(username)
 
         if perfil == "admin":
             url = "/admin/"
             cookie_name = config.ADMIN_COOKIE_NAME
-            user = await self.db.get_admin(username)
+            user = await self.repo.get_admin(username)
 
         response = RedirectResponse(url=f"{url}dashboard", status_code=302)
         if not user or not self.password.verify(password, user['password']):
@@ -79,7 +88,7 @@ class Auth:
             value=jwt_token,
             max_age=config.COOKIE_MAX_AGE * 60,
             httponly=config.COOKIE_HTTPONLY,
-            samesite=config.COOKIE_SAMESITE,
+            samesite=config.COOKIE_SAMESITE, # type: ignore
             secure=config.COOKIE_SECURE
         )
         return response

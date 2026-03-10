@@ -9,6 +9,7 @@ from fastapi_cache.backends.inmemory import InMemoryBackend
 from databases.db import DB
 from config import config
 from databases.repository import Repository
+from tools.jinja_filters import format_error_messages
 
 
 db = DB(config.DB_PATH)
@@ -35,3 +36,4 @@ app = FastAPI(
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
+templates.env.filters["format_error"] = format_error_messages

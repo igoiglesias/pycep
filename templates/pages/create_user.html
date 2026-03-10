@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/simple.min.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Criar Usuário</h1>
+    </header>
+    <main>
+        {% if error %}
+            <p style="color: red;">{{ error | format_error   }}</p>
+        {% endif %}
+        <form action="{{ url_for('user_post_create') }}" method="post">
+            <input type="text" name="name" placeholder="Nome" autofocus><br>
+            <input type="email" name="email" placeholder="Email"><br>
+            <input type="password" name="password" placeholder="Senha"><br>
+            <button type="submit">Criar Usuário</button>
+        </form>
+    </main>
+    
+</body>
+</html>

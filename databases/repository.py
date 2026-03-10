@@ -205,6 +205,20 @@ class Repository:
         return await self.db.fetchone(query, (user_id,))
 
 
+    async def get_user_by_email(self, email: str) -> aiosqlite.Row | None:
+        query = 'SELECT id FROM user WHERE email = ?'
+        return await self.db.fetchone(query, (email,))
+
+
+    async def create_user(self, name: str, email: str, password_hash: str) -> None:
+        query = '''
+            INSERT INTO user (name, email, password)
+            VALUES (?, ?, ?)
+        '''
+        await self.db.execute(query, (name, email, password_hash))
+
+
+
     async def save_request_log(self, cep: str, ip: str, user_agent: str, user_token: str, user_id: int, error: bool, error_message: str, response_time: float) -> None:
         query = '''
             INSERT INTO request_log (cep, ip, user_agent, user_token, user_id, error, error_message, response_time)

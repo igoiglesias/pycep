@@ -1,10 +1,10 @@
-from typing import Annotated
+from typing import Annotated, Literal
 from fastapi import Path
 from pydantic import BaseModel
 
 
 CEP = Annotated[str, Path(description="Cep a ser consultado", min_length=8, max_length=9)]
-
+PERFIL = Literal["user", "admin"]
 
 class CEP_CONTENT(BaseModel):
     """

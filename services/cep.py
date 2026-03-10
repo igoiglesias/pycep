@@ -4,22 +4,10 @@ from tools.key_builders import cep_key_builder
 
 
 class CEP:
-    def __init__(self, db, viacep, brasilapi):
-        self.db = db
+    def __init__(self, repo, viacep, brasilapi):
+        self.repo = repo
         self.viacep = viacep
         self.brasilapi = brasilapi
-
-
-    async def get_dashboard(self) -> dict:
-        """
-        Retorna os dados do dashboard.
-        """
-        total_consultas = await self.db.get_total_consultas()
-        top_ceps = await self.db.get_top_ceps()
-        return {
-            "total_consultas": total_consultas,
-            "top_ceps": top_ceps
-        }
 
 
     @cache(expire=CACHE_EXPIRE, key_builder=cep_key_builder)
@@ -27,7 +15,7 @@ class CEP:
         """
         Consulta o CEP.
         """
-        cep_data = await self.db.get_cep(cep)
+        cep_data = await self.repo.get_cep(cep)
         if cep_data:
             background_tasks.add_task(self.__add_to_fila_update, cep)
             return {
@@ -36,11 +24,9 @@ class CEP:
                 "content": dict(cep_data)
             }
 
-        cep_data = await self.viacep.consultar(cep)
+        cep_data = await self.__consultar_cep(cep)
         if cep_data.get('erro'):
-            cep_data = await self.brasilapi.consultar_cep(cep)
-            if cep_data.get('erro'):
-                return cep_data
+            return cep_data
 
         cep_data['content']['cep'] = cep
         background_tasks.add_task(self.__salvar, cep_data['content'])
@@ -48,43 +34,54 @@ class CEP:
         return cep_data
     
     
+    async def __consultar_cep(self, cep: str) -> dict:
+        """
+        Consulta o CEP sem cache.
+        """
+        cep_data = await self.viacep.consultar(cep)
+        if cep_data.get('erro'):
+            cep_data = await self.brasilapi.consultar_cep(cep)
+        
+        return cep_data
+    
+    
     async def __salvar(self, cep_data: dict) -> None:
         """
         Salva o CEP no banco de dados.
         """
-        await self.db.save_cep(cep_data)
+        await self.repo.save_cep(cep_data)
     
     
     async def __add_to_fila_update(self, cep: str) -> None:
         """
         Atualiza o CEP no banco de dados.
         """
-        if not await self.db.has_to_update(cep):
+        if not await self.repo.has_to_update(cep):
             return
 
-        await self.db.add_to_fila_update(cep)
+        await self.repo.add_to_fila_update(cep)
 
 
     async def update_cep(self, cep: str) -> dict:
         """Atualiza o CEP no banco de dados.
         """
-        cep_data = await self.viacep.consultar(cep)
+        cep_data = await self.__consultar_cep(cep)
         if cep_data.get('erro'):
             return cep_data
 
         cep_data['content']['cep'] = cep
-        await self.db.update_cep(cep_data['content'])
+        await self.repo.update_cep(cep_data['content'])
 
         return cep_data
     
     async def processar_fila_update(self) -> None:
         """Processa a fila de atualização de CEPs.
         """
-        ceps = await self.db.get_fila_update()
+        ceps = await self.repo.get_fila_update()
         for cep in ceps:
             cep_data = await self.update_cep(cep['cep'])
             if not cep_data['erro']:
-                await self.db.remove_from_fila_update(cep['cep'])
+                await self.repo.remove_from_fila_update(cep['cep'])
                 continue
             
             await self.__increment_update_attempts(cep)
@@ -93,6 +90,6 @@ class CEP:
         """Incrementa o número de tentativas de atualização de um CEP.
         """        
         if cep['tentativas'] >= TENTATIVAS_TO_UPDATE:
-            await self.db.set_error_fila_update(cep['cep'])
+            await self.repo.set_error_fila_update(cep['cep'])
 
-        await self.db.increment_update_attempts(cep['cep'])
+        await self.repo.increment_update_attempts(cep['cep'])

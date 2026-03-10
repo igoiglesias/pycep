@@ -6,14 +6,15 @@ from fastapi import Request
 
 
 class log:
-    def __init__(self, db):
-        self.db = db
+    def __init__(self, repo):
+        self.repo = repo
     
     def cep_request(self, func):
         @functools.wraps(func)
         async def wrapper(request: Request, *args, **kwargs):
             inicio = time.perf_counter()
-            kwargs['cep'] = re.sub(r"\D", "", kwargs.get("cep"))
+            cep = kwargs.get("cep", "")
+            kwargs['cep'] = re.sub(r"\D", "", cep)
             response = await func(request, *args, **kwargs)
             fim = time.perf_counter()
             exec_time = (fim - inicio) * 1000
@@ -29,7 +30,7 @@ class log:
             }
 
             asyncio.create_task(self.__log_request(data_to_log))
-            asyncio.create_task(self.__incrementar_uso(kwargs.get("cep")))
+            asyncio.create_task(self.__incrementar_uso(cep))
 
             return response
 
@@ -39,11 +40,11 @@ class log:
         """
         Incrementa o contador de uso do CEP.
         """
-        await self.db.incrementar_uso(cep)
+        await self.repo.incrementar_uso(cep)
     
     async def __log_request(self, data_to_log):
-        await self.db.save_request_log(**data_to_log)
-    
+        await self.repo.save_request_log(**data_to_log)
+
     
     def __pegar_ip_real(self,request: Request):
         ip_forwarded = request.headers.get("X-Forwarded-For")
@@ -54,6 +55,6 @@ class log:
         elif ip_real:
             ip_cliente = ip_real
         else:
-            ip_cliente = request.client.host
+            ip_cliente = request.client.host # type: ignore
 
         return ip_cliente
