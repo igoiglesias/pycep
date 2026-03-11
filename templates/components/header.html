@@ -12,6 +12,7 @@
     {% if request.state.user %}
     <nav>
         <a href="{{ url_for('user_dashboard') }}" class="current">Dashboard</a>
+        <a href="{{ url_for('user_token') }}">Tokens</a>
         <a href="{{ url_for('user_logout') }}">Sair</a>
     </nav>
     {% endif %}

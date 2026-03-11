@@ -61,7 +61,7 @@ async def user_logout(request: Request):
     return response
 
 
-@router.get("/create", response_class=HTMLResponse)
+@router.get("/user/create", response_class=HTMLResponse)
 async def user_create(request: Request):
     return templates.TemplateResponse(
         "pages/create_user.html", 
@@ -73,6 +73,38 @@ async def user_create(request: Request):
     )
 
 
-@router.post("/create")
+@router.post("/user/create")
 async def user_post_create(name: str = Form(default=None), email: str = Form(default=None), password: str = Form(default=None)):
+    return await user_service.create(name, email, password)
+
+
+@router.get("/user/token", response_class=HTMLResponse)
+@auth_service.verify(perfil="user")
+async def user_token(request: Request):
+    user = request.state.user
+    tokens = await user_service.get_tokens(user['id'])
+    return templates.TemplateResponse(
+        "pages/token_user.html", 
+        {
+            "request": request,
+            "tokens": tokens,
+            "title": "Listar Tokens"
+        }
+    )
+
+
+@router.get("/user/token/create", response_class=HTMLResponse)
+async def user_token_create(request: Request):
+    return templates.TemplateResponse(
+        "pages/token_user_create.html", 
+        {
+            "request": request,
+            "error": request.cookies.get("error"),
+            "title": "Criar Token"
+        }
+    )
+
+
+@router.post("/user/token/create")
+async def user_post_token_create(name: str = Form(default=None), email: str = Form(default=None), password: str = Form(default=None)):
     return await user_service.create(name, email, password)

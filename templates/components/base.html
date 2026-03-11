@@ -1,8 +1,11 @@
+{% block header %}
 {% include "components/header.html" %}
+{% endblock %}
 
 <main>
     {% block content %}{% endblock %}
 </main>
 
 {% block script %}{% endblock %}
+
 {% include "components/footer.html" %}

@@ -67,6 +67,19 @@ class Repository:
         ''')
         await self.db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_user ON user(email);")
         
+        await self.db.execute('''
+            CREATE TABLE IF NOT EXISTS token (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                token TEXT NOT NULL UNIQUE,
+                active INTEGER DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user) REFERENCES user(id) ON DELETE CASCADE
+            )
+        ''')
+        await self.db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_token ON token(token);")
+        
         await self.db.execute("""CREATE TABLE IF NOT EXISTS request_log (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             cep TEXT NOT NULL,
@@ -277,4 +290,12 @@ class Repository:
             SET status = 'error'
             WHERE cep = ?;
         '''
-        await self.db.execute(query, (cep,))    
+        await self.db.execute(query, (cep,))
+    
+
+    async def get_tokens_by_user_id(self, user_id: int) -> Iterable[aiosqlite.Row] | None:
+        query = '''
+            SELECT id, name, token FROM token
+            WHERE user = ? and active = 1
+        '''
+        return await self.db.fetchall(query, (user_id,))

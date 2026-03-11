@@ -11,15 +11,28 @@
         <h1>Criar Usuário</h1>
     </header>
     <main>
+        <section style="max-width: 400px; margin: auto;">
+        
         {% if error %}
             <p style="color: red;">{{ error | format_error   }}</p>
         {% endif %}
         <form action="{{ url_for('user_post_create') }}" method="post">
-            <input type="text" name="name" placeholder="Nome" autofocus><br>
-            <input type="email" name="email" placeholder="Email"><br>
-            <input type="password" name="password" placeholder="Senha"><br>
+            <p>
+                <label for="name">Nome:</label>
+                <input type="text" id="name" name="name" placeholder="Nome" autofocus>
+            </p>
+            <p>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="Email">
+            </p>
+            <p>
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" placeholder="Senha">
+            </p>
+            
             <button type="submit">Criar Usuário</button>
         </form>
+        </section>
     </main>
     
 </body>

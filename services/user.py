@@ -14,7 +14,7 @@ class User:
 
     async def create(self, name: str, email: str, password: str) -> RedirectResponse:
         """Cria um novo usuário."""
-        response = RedirectResponse(url="/create", status_code=302)
+        response = RedirectResponse(url="/user/create", status_code=302)
         validate_data = await self.validate_create_user_data(name, email, password)
         if validate_data["error"]:
             set_session_error(response, ";".join(validate_data["errors"]))
@@ -34,6 +34,7 @@ class User:
         
         response.headers['location'] = "/login"
         return response
+
 
     async def validate_create_user_data(self, name: str, email: str, password: str) -> dict:
         """Valida os dados de criação de usuário."""
@@ -62,4 +63,9 @@ class User:
             "errors": errors
         }
         return return_data
-        
+    
+
+    async def get_tokens(self, user_id: int) -> list:
+        """Retorna os tokens do usuário."""
+        tokens = await self.repo.get_tokens_by_user_id(user_id)
+        return tokens    
