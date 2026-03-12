@@ -1,0 +1,27 @@
+{% extends "components/base.html" %}
+
+{% block content %}
+<section>
+    <h1>Tokens</h1>
+    <p>Crie um novo token para o usuário.</p>
+    {% if error %}
+        <p style="color: red;">{{ error | format_error   }}</p>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('user_post_token_create') }}">
+        <div>
+            <label for="name">Nome:</label>
+            <input type="text" id="name" name="name" required placeholder="Nome do Token" autofocus>
+        </div>
+        <button type="submit">Criar Token</button>
+    </form>
+
+</section>
+
+
+
+{% endblock %}
+
+{% block script %}
+{% endblock %}
+

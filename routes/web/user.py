@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated
 from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from services.auth import Auth as AuthService
@@ -10,7 +10,7 @@ from config import config
 
 router = APIRouter(
     tags=["Index"],
-    # include_in_schema = False
+    include_in_schema = False
 )
 
 repo = Repository(get_db)
@@ -94,6 +94,7 @@ async def user_token(request: Request):
 
 
 @router.get("/user/token/create", response_class=HTMLResponse)
+@auth_service.verify(perfil="user")
 async def user_token_create(request: Request):
     return templates.TemplateResponse(
         "pages/token_user_create.html", 
@@ -106,5 +107,14 @@ async def user_token_create(request: Request):
 
 
 @router.post("/user/token/create")
-async def user_post_token_create(name: str = Form(default=None), email: str = Form(default=None), password: str = Form(default=None)):
-    return await user_service.create(name, email, password)
+@auth_service.verify(perfil="user")
+async def user_post_token_create(request: Request, name: str = Form(default=None)):
+    user = request.state.user
+    return await user_service.create_token(user['id'], name)
+
+
+@router.post("/user/token/delete/{token_id}")
+@auth_service.verify(perfil="user")
+async def user_token_delete(request: Request, token_id: int):
+    user = request.state.user
+    return await user_service.delete_token(user['id'], token_id)

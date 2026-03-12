@@ -4,11 +4,10 @@ import httpx
 
 class ViaCEP:
     def __init__(self):
-        self.base_url = VIACEP_URL
         self.client = httpx.AsyncClient(
             timeout=60.0,
             http2=True,
-            base_url=self.base_url,
+            base_url=VIACEP_URL,
             limits=httpx.Limits(max_keepalive_connections=2, max_connections=6)
         )
     
@@ -21,14 +20,14 @@ class ViaCEP:
             return {
                 "erro": True,
                 "mensagem": "Erro ao consultar CEP",
-                "content": None
+                "content": {}
             }
 
         if response.status_code != 200 or response.json().get("erro"):
             return {
                 "erro": True,
                 "mensagem": "CEP não encontrado",
-                "content": None
+                "content": {}
             }
 
         return {

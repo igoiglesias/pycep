@@ -2,8 +2,11 @@
 
 {% block content %}
 <section>
-    <h1>Tokens</h1>
+    <h1>Tokens</h1> <a href="{{ url_for('user_token_create') }}">Adicionar Token</a>
     <p>Lista de tokens do usuário.</p>
+    {% if error %}
+        <p style="color: red;">{{ error | format_error   }}</p>
+    {% endif %}
 
     <table>
         <thead>
@@ -17,10 +20,14 @@
             {% for token in tokens %}
             <tr>
                 <td>{{ token['name'] }}</td>
-                <td>{{ token['token'] }}</td>
+                <td>{{ token['token'] | truncate(40) }}</td>
+                <td hidden>{{ token['token'] }}</td>
                 <td>
-                    <a href="#">Copiar</a>
-                    <a href="#">Revogar</a>
+                    
+                    <button class="copiar">Copiar</button>
+                    <form action="{{ url_for('user_token_delete', token_id=token['id']) }}" method="post">
+                        <button type="submit" onclick="return confirm('Tem certeza que deseja excluir este token?')">Excluir</button>
+                    </form>
                 </td>
             </tr>
             {% endfor %}
@@ -33,5 +40,17 @@
 {% endblock %}
 
 {% block script %}
+<script>
+    document.querySelectorAll('.copiar').forEach(button => {
+        button.addEventListener('click', () => {
+            const token = button.closest('tr').querySelector('td:nth-child(3)').textContent.trim();
+            navigator.clipboard.writeText(token).then(() => {
+                alert('Token copiado para a área de transferência!');
+            }).catch(err => {
+                alert('Erro ao copiar o token: ' + err);
+            });
+        });
+    });
+</script>
 {% endblock %}
 

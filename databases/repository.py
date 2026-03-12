@@ -27,6 +27,7 @@ class Repository:
                 gia TEXT,
                 ddd TEXT,
                 siafi TEXT,
+                existe INTEGER DEFAULT 1,
                 usage_count INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -132,25 +133,26 @@ class Repository:
         query = 'SELECT cep, logradouro, complemento, unidade, bairro, localidade, uf, estado, regiao, ibge, gia, ddd, siafi FROM cep WHERE cep = ?'
         return await self.db.fetchone(query, (cep,))
 
-    async def save_cep(self, cep_data: dict) -> None:
+    async def save_cep(self, cep_data: dict, cep: str) -> None:
         query  = '''
-            INSERT INTO cep (cep, logradouro, complemento, unidade, bairro, localidade, uf, estado, regiao, ibge, gia, ddd, siafi)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO cep (cep, logradouro, complemento, unidade, bairro, localidade, uf, estado, regiao, ibge, gia, ddd, siafi, existe)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         '''
         await self.db.execute(query, (
-            cep_data['cep'],
-            cep_data['logradouro'],
-            cep_data['complemento'],
-            cep_data['unidade'],
-            cep_data['bairro'],
-            cep_data['localidade'],
-            cep_data['uf'],
-            cep_data['estado'],
-            cep_data['regiao'],
-            cep_data['ibge'],
-            cep_data['gia'],
-            cep_data['ddd'],
-            cep_data['siafi']
+            cep,
+            cep_data['content'].get('logradouro'),
+            cep_data['content'].get('complemento'),
+            cep_data['content'].get('unidade'),
+            cep_data['content'].get('bairro'),
+            cep_data['content'].get('localidade'),
+            cep_data['content'].get('uf'),
+            cep_data['content'].get('estado'),
+            cep_data['content'].get('regiao'),
+            cep_data['content'].get('ibge'),
+            cep_data['content'].get('gia'),
+            cep_data['content'].get('ddd'),
+            cep_data['content'].get('siafi'),
+            0 if cep_data['erro'] else 1
         ))
 
 
@@ -261,7 +263,7 @@ class Repository:
         query = '''
             SELECT id, cep, tentativas FROM fila_update
             WHERE status = 'pending' and tentativas <= ?
-            ORDER BY created_at ASC
+            ORDER BY created_at ASCexecute
             LIMIT 10;
         '''
         return await self.db.fetchall(query, (TENTATIVAS_TO_UPDATE,))
@@ -291,11 +293,28 @@ class Repository:
             WHERE cep = ?;
         '''
         await self.db.execute(query, (cep,))
-    
+
 
     async def get_tokens_by_user_id(self, user_id: int) -> Iterable[aiosqlite.Row] | None:
         query = '''
             SELECT id, name, token FROM token
-            WHERE user = ? and active = 1
+            WHERE user = ? and active = 1 
+            ORDER BY created_at DESC
         '''
         return await self.db.fetchall(query, (user_id,))
+
+
+    async def create_token(self, user_id: int, name: str, token: str) -> None:
+        query = '''
+            INSERT INTO token (user, name, token)
+            VALUES (?, ?, ?)
+        '''
+        await self.db.execute(query, (user_id, name, token))
+    
+    
+    async def delete_token(self, user_id: int, token_id: int) -> None:
+        query = '''
+            DELETE FROM token
+            WHERE id = ? and user = ?;
+        '''
+        await self.db.execute(query, (token_id, user_id,))

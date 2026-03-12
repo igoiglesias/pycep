@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-VIACEP_URL = os.getenv("VIACEP_URL")
-BRASILAPI_URL = os.getenv("BRASILAPI_URL")
+VIACEP_URL = os.getenv("VIACEP_URL", "")
+BRASILAPI_URL = os.getenv("BRASILAPI_URL", "")
 
 DB_PATH = os.getenv("DB_PATH", "")
 
@@ -28,3 +28,5 @@ COOKIE_MAX_AGE = int(os.getenv("COOKIE_MAX_AGE", "60"))
 JWT_SECRET = os.getenv("JWT_SECRET")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
 JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "3600"))
+
+MAX_TOKENS_PER_USER = int(os.getenv("MAX_TOKENS_PER_USER", "5"))

@@ -25,11 +25,11 @@ class CEP:
             }
 
         cep_data = await self.__consultar_cep(cep)
-        if cep_data.get('erro'):
-            return cep_data
 
-        cep_data['content']['cep'] = cep
-        background_tasks.add_task(self.__salvar, cep_data['content'])
+        background_tasks.add_task(self.__salvar, cep_data.copy(), cep)
+        
+        if not cep_data['content']: 
+            cep_data['content'] = None
 
         return cep_data
     
@@ -45,11 +45,11 @@ class CEP:
         return cep_data
     
     
-    async def __salvar(self, cep_data: dict) -> None:
+    async def __salvar(self, cep_data: dict, cep: str) -> None:
         """
         Salva o CEP no banco de dados.
         """
-        await self.repo.save_cep(cep_data)
+        await self.repo.save_cep(cep_data, cep)
     
     
     async def __add_to_fila_update(self, cep: str) -> None:
