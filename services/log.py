@@ -1,8 +1,11 @@
 import re
 import functools
-import asyncio
 import time
+
+import asyncio
 from fastapi import Request
+
+from tools.ip import pegar_ip_real
 
 
 class log:
@@ -20,7 +23,7 @@ class log:
             exec_time = (fim - inicio) * 1000
             data_to_log = {
                 "cep": kwargs.get("cep"),
-                "ip": self.__pegar_ip_real(request),
+                "ip": pegar_ip_real(request),
                 "response_time": exec_time,
                 "error": response.get('erro'),
                 "error_message": response.get('mensagem'),
@@ -44,17 +47,3 @@ class log:
     
     async def __log_request(self, data_to_log):
         await self.repo.save_request_log(**data_to_log)
-
-    
-    def __pegar_ip_real(self,request: Request):
-        ip_forwarded = request.headers.get("X-Forwarded-For")
-        ip_real = request.headers.get("X-Real-IP")
-
-        if ip_forwarded:
-            ip_cliente = ip_forwarded.split(",")[0].strip()
-        elif ip_real:
-            ip_cliente = ip_real
-        else:
-            ip_cliente = request.client.host # type: ignore
-
-        return ip_cliente

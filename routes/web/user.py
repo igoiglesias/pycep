@@ -1,11 +1,14 @@
 from typing import Annotated
+
 from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
+
 from services.auth import Auth as AuthService
 from services.user import User as UserService
 from bootstrap import templates, get_db
 from databases.repository import Repository
 from config import config
+from tools.rate_limit import rate_limit
 
 
 router = APIRouter(
@@ -20,6 +23,7 @@ user_service = UserService(repo)
 
 
 @router.get("/", response_class=HTMLResponse)
+@rate_limit(limit=50, per=60)
 async def index(request: Request):
     return templates.TemplateResponse("pages/index.html", {"request": request, "title": "PyCEP"})
 

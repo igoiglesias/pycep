@@ -130,7 +130,7 @@ class Repository:
 
 
     async def get_cep(self, cep: str) -> aiosqlite.Row | None:
-        query = 'SELECT cep, logradouro, complemento, unidade, bairro, localidade, uf, estado, regiao, ibge, gia, ddd, siafi FROM cep WHERE cep = ?'
+        query = 'SELECT cep, logradouro, complemento, unidade, bairro, localidade, uf, estado, regiao, ibge, gia, ddd, siafi, existe FROM cep WHERE cep = ?'
         return await self.db.fetchone(query, (cep,))
 
     async def save_cep(self, cep_data: dict, cep: str) -> None:
