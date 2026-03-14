@@ -6,3 +6,8 @@ argon2-cffi
 locust
 httpx[http2]
 aiosqlite
+orjson
+gunicorn
+uvicorn
+httptools
+uvloop

@@ -17,7 +17,10 @@ elif [ "$command" == "dev" ]; then
     fastapi dev app.py
 
 elif [ "$command" == "prod" ]; then
-    fastapi run app.py --workers $cpus
+    fastapi run app.py
+
+elif [ "$command" == "superprod" ]; then
+    gunicorn -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 app:app
 
 elif [ "$command" == "script" ]; then
     if [ -z "$option" ]; then

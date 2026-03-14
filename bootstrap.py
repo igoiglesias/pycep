@@ -1,6 +1,7 @@
 from typing import AsyncIterator
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi_cache import FastAPICache
@@ -31,7 +32,11 @@ app = FastAPI(
     title="PyCEP",
     description="API wrapper do ViaCEP para consulta de CEP.",
     version="0.0.1",
-    lifespan=lifespan
+    lifespan=lifespan,
+    default_response_class=ORJSONResponse,
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

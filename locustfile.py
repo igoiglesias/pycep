@@ -2,13 +2,13 @@ from locust import HttpUser, task, between, constant_throughput
 import random
 
 
-TAMANHO_POOL = 50
+TAMANHO_POOL = 500
 
-POOL_CEPS = [f"{random.randint(0, 99999):05d}-{random.randint(0, 999):03d}" for _ in range(TAMANHO_POOL)]
+POOL_CEPS = [f"{random.randint(1001000, 99999999):08d}" for _ in range(TAMANHO_POOL)]
 
 class TesteApiCep(HttpUser):
-    # wait_time = between(0.1, 0.5)
-    wait_time = constant_throughput(0.1)
+    wait_time = between(0.1, 0.5)
+    # wait_time = constant_throughput(0.1)
 
     @task
     def buscar_cep(self):
