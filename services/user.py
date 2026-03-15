@@ -1,4 +1,3 @@
-import re
 import hashlib
 
 from fastapi.responses import RedirectResponse
@@ -6,6 +5,7 @@ from fastapi.responses import RedirectResponse
 from config.config import MAX_TOKENS_PER_USER
 from tools.session_error import set_session_error
 from tools.password import Password
+from tools.validators import EMAIL_PATTERN
 
 
 class User:
@@ -40,8 +40,6 @@ class User:
 
     async def validate_create_user_data(self, name: str, email: str, password: str) -> dict:
         """Valida os dados de criação de usuário."""
-        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        
         errors = []
         if not name:
             errors.append("O nome é obrigatório.")
@@ -52,7 +50,7 @@ class User:
 
         if not email:
             errors.append("O email é obrigatório.")
-        elif not bool(re.match(email_pattern, email)):
+        elif not bool(EMAIL_PATTERN.match(email)):
             errors.append("O email deve ser válido.")
 
         if not password:

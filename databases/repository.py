@@ -28,7 +28,6 @@ class Repository:
                 ddd TEXT,
                 siafi TEXT,
                 existe INTEGER DEFAULT 1,
-                usage_count INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -118,11 +117,6 @@ class Repository:
         ''')
 
 
-    async def incrementar_uso(self, cep: str):
-        query = 'UPDATE cep SET usage_count = usage_count + 1 WHERE cep = ?'
-        return await self.db.execute(query, (cep,))
-
-
     async def has_to_update(self, cep: str) -> aiosqlite.Row | None:
         limit_date = datetime.now(timezone.utc) - timedelta(days=DAYS_TO_UPDATE)
         query = 'SELECT id FROM cep WHERE cep = ? AND updated_at < ?'
@@ -188,16 +182,6 @@ class Repository:
             cep_data['siafi'],
             cep_data['cep']
         ))
-
-
-    async def get_total_consultas(self) -> aiosqlite.Row | None:
-        query = 'SELECT SUM(usage_count) as total FROM cep'
-        return await self.db.fetchone(query)
-    
-
-    async def get_top_ceps(self) -> Iterable[aiosqlite.Row] | None:
-        query = 'SELECT cep, usage_count FROM cep ORDER BY usage_count DESC LIMIT 5'
-        return await self.db.fetchall(query)
 
 
     async def get_admin(self, email: str) -> aiosqlite.Row | None:

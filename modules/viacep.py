@@ -13,6 +13,11 @@ class ViaCEP:
     
     async def consultar(self, cep: str) -> dict:
         url = f"/{cep}/json/"
+        return {
+                "erro": True,
+                "mensagem": "Erro ao consultar CEP",
+                "content": {}
+            }
         try:
             response = await self.client.get(url)
         except Exception as e:

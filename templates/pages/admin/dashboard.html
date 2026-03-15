@@ -10,7 +10,7 @@
                     <h2>Total de Consultas</h2>
                 </header>
                 <p><small>O volume geral de pesquisas realizadas até o momento é de:</small></p>
-                <h1><mark>{{ total_consultas.total }}</mark></h1>
+                <h1><mark></mark></h1>
             </article>
         </section>
 
@@ -33,7 +33,6 @@
                         <tr>
                             <td scope="row">{{ loop.index }}º</td> 
                             <td><code>{{ item.cep }}</code></td>
-                            <td>{{ item.usage_count }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

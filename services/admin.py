@@ -8,8 +8,8 @@ class Admin:
         """
         Retorna os dados do dashboard.
         """
-        total_consultas = await self.repo.get_total_consultas()
-        top_ceps = await self.repo.get_top_ceps()
+        total_consultas = ""
+        top_ceps = []
         return {
             "total_consultas": total_consultas,
             "top_ceps": top_ceps

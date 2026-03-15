@@ -89,7 +89,10 @@ class CEP:
                 "ddd": None,
                 "siafi": None
             }
-        await self.repo.save_cep(cep_data, cep)
+        try:
+            await self.repo.save_cep(cep_data, cep)
+        except Exception:
+            pass
     
     
     async def __add_to_fila_update(self, cep: str) -> None:
