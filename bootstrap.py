@@ -10,6 +10,7 @@ from fastapi_cache.backends.inmemory import InMemoryBackend
 from databases.db import DB
 from config import config
 from databases.repository import Repository
+from services.rate_limit import RateLimit
 from tools.jinja_filters import format_error_messages
 
 
@@ -42,3 +43,5 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 templates.env.filters["format_error"] = format_error_messages
+
+rate_limiter = RateLimit(repo)

@@ -302,3 +302,11 @@ class Repository:
             WHERE id = ? and user = ?;
         '''
         await self.db.execute(query, (token_id, user_id,))
+
+
+    async def get_token(self, token: str) -> aiosqlite.Row | None:
+        query = '''
+            SELECT id, user, name FROM token
+            WHERE token = ? and active = 1
+        '''
+        return await self.db.fetchone(query, (token,))

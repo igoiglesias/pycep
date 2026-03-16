@@ -4,7 +4,7 @@ from modules.viacep import ViaCEP
 from modules.brasilapi import BrasilAPI
 from services.cep import CEP as CEPService
 from services.log import log as LogService
-from bootstrap import get_db
+from bootstrap import get_db, rate_limiter
 from databases.repository import Repository
 
 
@@ -23,6 +23,7 @@ log_service = LogService(repo)
 
 @router.get("/{cep}", response_model=CEP_RESPONSE)
 @log_service.cep_request
+@rate_limiter.rate_limit(limit=5, per=60)
 async def consulta_cep(request: Request, cep: CEP, background_tasks: BackgroundTasks):
     """
     Consulta o CEP informado
