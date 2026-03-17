@@ -1,5 +1,7 @@
 #!/bin/bash
-source .venv/bin/activate
+if [ -d ".venv" ]; then
+    source .venv/bin/activate
+fi
 
 command="$1"
 option="$2"
