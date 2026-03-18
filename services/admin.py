@@ -22,8 +22,8 @@ class Admin:
             "taxa_erro": taxa_erro,
             "avg_response_time": avg_response_time,
             "total_users": total_users,
-            "top_ceps": [{"cep": r["cep"], "total": r["total"]} for r in top_ceps],
-            "consultas_por_mes": [{"mes": r["mes"], "total": r["total"]} for r in consultas_por_mes],
-            "consultas_por_dia": [{"dia": r["dia"], "total": r["total"]} for r in consultas_por_dia],
-            "erros_por_tipo": [{"tipo": r["error_message"], "total": r["total"]} for r in erros_por_tipo],
+            "top_ceps": [{"cep": r["cep"], "total": r["total"]} for r in (top_ceps or [])],
+            "consultas_por_mes": [{"mes": r["mes"], "total": r["total"]} for r in (consultas_por_mes or [])],
+            "consultas_por_dia": [{"dia": r["dia"], "total": r["total"]} for r in (consultas_por_dia or [])],
+            "erros_por_tipo": [{"tipo": r["error_message"], "total": r["total"]} for r in (erros_por_tipo or [])],
         }
