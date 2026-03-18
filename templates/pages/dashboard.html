@@ -1,11 +1,28 @@
 {% extends "components/base.html" %}
 
 {% block content %}
-<h1>Dash</h1>
-<p>Bem-vindo ao painel de controle do usuário.</p>
-<p>Aqui você pode gerenciar suas informações, tokens de acesso e outras configurações relacionadas à sua conta.</p>
-{% endblock %}
+<section>
+    <h2>Olá, {{ request.state.user.name }}</h2>
+    <p>Gerencie seus tokens de acesso e integre a API de CEP no seu projeto.</p>
 
-{% block script %}
-{% endblock %}
+    <div class="dash-grid">
+        <article>
+            <h3>Tokens de API</h3>
+            <p>Crie e gerencie seus tokens para autenticar requisições à API e aumentar seu limite de consultas.</p>
+            <a class="button" href="{{ url_for('user_token') }}">Gerenciar tokens</a>
+        </article>
 
+        <article>
+            <h3>Documentação</h3>
+            <p>Veja como integrar a API no seu projeto com exemplos em JavaScript e Python.</p>
+            <a class="button" href="/#docs">Ver documentação</a>
+        </article>
+
+        <article>
+            <h3>Testar API</h3>
+            <p>Faça uma consulta direto no navegador para validar que sua integração está funcionando.</p>
+            <a class="button" href="/#testar">Testar agora</a>
+        </article>
+    </div>
+</section>
+{% endblock %}

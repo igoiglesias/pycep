@@ -2,26 +2,22 @@
 
 {% block content %}
 <section>
-    <h1>Tokens</h1>
-    <p>Crie um novo token para o usuário.</p>
+    <h2>Novo Token</h2>
+    <p>Dê um nome descritivo para identificar onde este token será usado.</p>
+
     {% if error %}
-        <p style="color: red;">{{ error | format_error   }}</p>
+        <p class="error-msg">{{ error | format_error }}</p>
     {% endif %}
 
-    <form method="POST" action="{{ url_for('user_post_token_create') }}">
-        <div>
-            <label for="name">Nome:</label>
-            <input type="text" id="name" name="name" required placeholder="Nome do Token" autofocus>
-        </div>
-        <button type="submit">Criar Token</button>
+    <form class="auth-form" method="POST" action="{{ url_for('user_post_token_create') }}">
+        <label for="name">Nome do token</label>
+        <input type="text" id="name" name="name" required placeholder="Ex: meu-ecommerce" minlength="3" maxlength="50" autofocus>
+
+        <button type="submit">Criar token</button>
     </form>
 
+    <p class="auth-links">
+        <a href="{{ url_for('user_token') }}">Voltar para tokens</a>
+    </p>
 </section>
-
-
-
 {% endblock %}
-
-{% block script %}
-{% endblock %}
-

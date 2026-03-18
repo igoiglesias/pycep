@@ -1,39 +1,36 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/simple.min.css') }}">
-</head>
-<body>
-    <header>
-        <h1>Criar Usuário</h1>
-    </header>
-    <main>
-        <section style="max-width: 400px; margin: auto;">
-        
-        {% if error %}
-            <p style="color: red;">{{ error | format_error   }}</p>
-        {% endif %}
-        <form action="{{ url_for('user_post_create') }}" method="post">
-            <p>
-                <label for="name">Nome:</label>
-                <input type="text" id="name" name="name" placeholder="Nome" autofocus>
-            </p>
-            <p>
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" placeholder="Email">
-            </p>
-            <p>
-                <label for="password">Senha:</label>
-                <input type="password" id="password" name="password" placeholder="Senha">
-            </p>
-            
-            <button type="submit">Criar Usuário</button>
-        </form>
-        </section>
-    </main>
-    
-</body>
-</html>
+{% extends "components/base.html" %}
+
+{% block header %}
+<header>
+    <nav aria-label="Navegação">
+        <a href="/"><strong>PyCEP</strong></a>
+    </nav>
+    <h1>Criar Conta</h1>
+    <p>Cadastre-se para obter tokens de acesso à API.</p>
+</header>
+{% endblock %}
+
+{% block content %}
+<section>
+    {% if error %}
+        <p class="error-msg">{{ error | format_error }}</p>
+    {% endif %}
+
+    <form class="auth-form" action="{{ url_for('user_post_create') }}" method="post">
+        <label for="name">Nome completo</label>
+        <input type="text" id="name" name="name" placeholder="Seu nome completo" autocomplete="name" required autofocus>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="seu@email.com" autocomplete="email" required>
+
+        <label for="password">Senha</label>
+        <input type="password" id="password" name="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" required>
+
+        <button type="submit">Criar conta</button>
+    </form>
+
+    <p class="auth-links">
+        Já tem conta? <a href="{{ url_for('user_login') }}">Fazer login</a>
+    </p>
+</section>
+{% endblock %}

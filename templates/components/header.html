@@ -1,21 +1,19 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/simple.min.css') }}">
-</head>
-<body>
-
 <header>
     {% if request.state.user %}
-    <nav>
-        <a href="{{ url_for('user_dashboard') }}" class="current">Dashboard</a>
+    <nav aria-label="Navegação do painel">
+        <a href="/"><strong>PyCEP</strong></a>
+        <a href="{{ url_for('user_dashboard') }}">Dashboard</a>
         <a href="{{ url_for('user_token') }}">Tokens</a>
         <a href="{{ url_for('user_logout') }}">Sair</a>
     </nav>
+    <h1>Olá, {{ request.state.user.name }}</h1>
+    <p>Gerencie seus tokens e integre a API no seu projeto.</p>
+    {% else %}
+    <nav aria-label="Navegação">
+        <a href="/"><strong>PyCEP</strong></a>
+        <a href="{{ url_for('user_login') }}">Login</a>
+    </nav>
+    <h1>PyCEP</h1>
+    <p>Consulta rápida de endereço via API.</p>
     {% endif %}
-    <h1>Consultar CEP</h1>
-    <p>Consulta rápida de endereço via API interna.</p>
 </header>

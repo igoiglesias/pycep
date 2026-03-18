@@ -26,10 +26,10 @@ auth_service = AuthService(repo)
 async def admin_login(request: Request):
     error = request.cookies.get("error")
     return templates.TemplateResponse(
-        "pages/admin/login.html", 
+        "pages/admin/login.html",
         {
             "request": request,
-            "title": "Admin Login", 
+            "title": "Admin Login",
             "error": error
         }
     )
@@ -51,14 +51,13 @@ async def admin_logout(request: Request):
 @auth_service.verify(perfil="admin")
 async def admin_dashboard(request: Request):
     user = request.state.user
-    dashboard_data = await admin_service.get_dashboard()
+    data = await admin_service.get_dashboard()
     return templates.TemplateResponse(
         "pages/admin/dashboard.html",
         {
             "request": request,
             "title": "Dashboard",
-            "total_consultas": dashboard_data['total_consultas'],
-            "top_ceps": dashboard_data['top_ceps'],
-            "user": user
+            "user": user,
+            **data
         }
     )

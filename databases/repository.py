@@ -279,6 +279,77 @@ class Repository:
         await self.db.execute(query, (cep,))
 
 
+    # ===== DASHBOARD ADMIN =====
+
+    async def get_total_consultas(self) -> int:
+        query = 'SELECT COUNT(*) as total FROM request_log'
+        row = await self.db.fetchone(query)
+        return row['total'] if row else 0
+
+
+    async def get_total_erros(self) -> int:
+        query = 'SELECT COUNT(*) as total FROM request_log WHERE error = 1'
+        row = await self.db.fetchone(query)
+        return row['total'] if row else 0
+
+
+    async def get_avg_response_time(self) -> float:
+        query = 'SELECT AVG(response_time) as avg_time FROM request_log WHERE error = 0'
+        row = await self.db.fetchone(query)
+        return round(row['avg_time'] * 1000, 1) if row and row['avg_time'] else 0
+
+
+    async def get_total_users(self) -> int:
+        query = 'SELECT COUNT(*) as total FROM user WHERE active = 1'
+        row = await self.db.fetchone(query)
+        return row['total'] if row else 0
+
+
+    async def get_top_ceps(self, limit: int = 5) -> Iterable[aiosqlite.Row]:
+        query = '''
+            SELECT cep, COUNT(*) as total
+            FROM request_log
+            WHERE error = 0
+            GROUP BY cep
+            ORDER BY total DESC
+            LIMIT ?
+        '''
+        return await self.db.fetchall(query, (limit,))
+
+
+    async def get_consultas_por_mes(self, meses: int = 6) -> Iterable[aiosqlite.Row]:
+        query = '''
+            SELECT strftime('%Y-%m', created_at) as mes, COUNT(*) as total
+            FROM request_log
+            WHERE created_at >= date('now', ?)
+            GROUP BY mes
+            ORDER BY mes ASC
+        '''
+        return await self.db.fetchall(query, (f'-{meses} months',))
+
+
+    async def get_consultas_por_dia(self, dias: int = 30) -> Iterable[aiosqlite.Row]:
+        query = '''
+            SELECT date(created_at) as dia, COUNT(*) as total
+            FROM request_log
+            WHERE created_at >= date('now', ?)
+            GROUP BY dia
+            ORDER BY dia ASC
+        '''
+        return await self.db.fetchall(query, (f'-{dias} days',))
+
+
+    async def get_erros_por_tipo(self) -> Iterable[aiosqlite.Row]:
+        query = '''
+            SELECT error_message, COUNT(*) as total
+            FROM request_log
+            WHERE error = 1 AND error_message IS NOT NULL
+            GROUP BY error_message
+            ORDER BY total DESC
+        '''
+        return await self.db.fetchall(query)
+
+
     async def get_tokens_by_user_id(self, user_id: int) -> Iterable[aiosqlite.Row] | None:
         query = '''
             SELECT id, name, token FROM token

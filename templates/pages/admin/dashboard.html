@@ -1,52 +1,214 @@
 {% extends "components/admin/base.html" %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/dashboard.css') }}">
+{% endblock %}
+
 {% block content %}
-<main>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; align-items: start;">
-        
-        <section>
-            <article>
-                <header>
-                    <h2>Total de Consultas</h2>
-                </header>
-                <p><small>O volume geral de pesquisas realizadas até o momento é de:</small></p>
-                <h1><mark></mark></h1>
-            </article>
-        </section>
 
-        <section>
-            <h2>Top 5 CEPs</h2>
-            <p><small>Ranking dos códigos postais mais buscados.</small></p>
-            
+<!-- KPI Cards -->
+<section class="kpi-row">
+    <article class="kpi-card">
+        <span class="kpi-icon" aria-hidden="true">📊</span>
+        <p class="kpi-value">{{ total_consultas }}</p>
+        <p class="kpi-label">Consultas</p>
+    </article>
+    <article class="kpi-card">
+        <span class="kpi-icon" aria-hidden="true">⚠️</span>
+        <p class="kpi-value kpi-danger">{{ taxa_erro }}%</p>
+        <p class="kpi-label">Taxa de erro</p>
+    </article>
+    <article class="kpi-card">
+        <span class="kpi-icon" aria-hidden="true">⚡</span>
+        <p class="kpi-value">{{ avg_response_time }}ms</p>
+        <p class="kpi-label">Tempo médio</p>
+    </article>
+    <article class="kpi-card">
+        <span class="kpi-icon" aria-hidden="true">👥</span>
+        <p class="kpi-value">{{ total_users }}</p>
+        <p class="kpi-label">Usuários</p>
+    </article>
+</section>
+
+<!-- Gráficos principais -->
+<div class="chart-grid">
+
+    <!-- Consultas por mês -->
+    <section>
+        <article>
+            <h3>Consultas por mês</h3>
+            <canvas id="chartMes" aria-label="Gráfico de consultas por mês"></canvas>
+        </article>
+    </section>
+
+    <!-- Consultas por dia (últimos 30 dias) -->
+    <section>
+        <article>
+            <h3>Últimos 30 dias</h3>
+            <canvas id="chartDia" aria-label="Gráfico de consultas por dia"></canvas>
+        </article>
+    </section>
+
+    <!-- Top CEPs -->
+    <section>
+        <article>
+            <h3>Top 5 CEPs</h3>
             {% if top_ceps %}
-                <table>
-                    <caption>Distribuição das regiões mais buscadas</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">Posição</th>
-                            <th scope="col">CEP</th>
-                            <th scope="col">Consultas</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in top_ceps %}
-                        <tr>
-                            <td scope="row">{{ loop.index }}º</td> 
-                            <td><code>{{ item.cep }}</code></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <canvas id="chartTopCeps" aria-label="Gráfico dos CEPs mais buscados"></canvas>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">CEP</th>
+                        <th scope="col">Consultas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in top_ceps %}
+                    <tr>
+                        <td>{{ loop.index }}º</td>
+                        <td><code>{{ item.cep }}</code></td>
+                        <td>{{ item.total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             {% else %}
-                <blockquote>
-                    <p><strong>Aviso:</strong> Ainda não há consultas registradas na plataforma.</p>
-                </blockquote>
+            <div class="empty-state">
+                <span class="icon" aria-hidden="true">📭</span>
+                <p>Nenhuma consulta com sucesso registrada.</p>
+            </div>
             {% endif %}
-        </section>
+        </article>
+    </section>
 
-    </div>
-</main>
+    <!-- Erros por tipo -->
+    <section>
+        <article>
+            <h3>Distribuição de erros</h3>
+            {% if erros_por_tipo %}
+            <canvas id="chartErros" aria-label="Gráfico de distribuição de erros"></canvas>
+            {% else %}
+            <div class="empty-state">
+                <span class="icon" aria-hidden="true">✅</span>
+                <p>Nenhum erro registrado.</p>
+            </div>
+            {% endif %}
+        </article>
+    </section>
+
+</div>
+
 {% endblock %}
 
 {% block script %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+    // Detecta dark mode para cores dos gráficos
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const textColor = isDark ? '#dcdcdc' : '#212121';
+    const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
+    const accent = isDark ? '#818cf8' : '#6366f1';
+    const accentLight = isDark ? 'rgba(129,140,248,0.2)' : 'rgba(99,102,241,0.15)';
+
+    const defaultOptions = {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: false },
+        },
+        scales: {
+            x: { ticks: { color: textColor }, grid: { color: gridColor } },
+            y: { ticks: { color: textColor }, grid: { color: gridColor }, beginAtZero: true },
+        },
+    };
+
+    // --- Consultas por mês (bar) ---
+    const meses = {{ consultas_por_mes | tojson }};
+    new Chart(document.getElementById('chartMes'), {
+        type: 'bar',
+        data: {
+            labels: meses.map(m => {
+                const [y, mo] = m.mes.split('-');
+                return new Date(y, mo - 1).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+            }),
+            datasets: [{
+                data: meses.map(m => m.total),
+                backgroundColor: accent,
+                borderRadius: 4,
+            }]
+        },
+        options: defaultOptions,
+    });
+
+    // --- Consultas por dia (line) ---
+    const dias = {{ consultas_por_dia | tojson }};
+    new Chart(document.getElementById('chartDia'), {
+        type: 'line',
+        data: {
+            labels: dias.map(d => {
+                const dt = new Date(d.dia + 'T00:00:00');
+                return dt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+            }),
+            datasets: [{
+                data: dias.map(d => d.total),
+                borderColor: accent,
+                backgroundColor: accentLight,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3,
+                pointBackgroundColor: accent,
+            }]
+        },
+        options: defaultOptions,
+    });
+
+    // --- Top CEPs (horizontal bar) ---
+    {% if top_ceps %}
+    const topCeps = {{ top_ceps | tojson }};
+    new Chart(document.getElementById('chartTopCeps'), {
+        type: 'bar',
+        data: {
+            labels: topCeps.map(c => c.cep),
+            datasets: [{
+                data: topCeps.map(c => c.total),
+                backgroundColor: [accent, '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'],
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            ...defaultOptions,
+            indexAxis: 'y',
+        },
+    });
+    {% endif %}
+
+    // --- Erros por tipo (doughnut) ---
+    {% if erros_por_tipo %}
+    const erros = {{ erros_por_tipo | tojson }};
+    const errColors = ['#ef4444', '#f97316', '#eab308', '#06b6d4', '#8b5cf6', '#ec4899'];
+    new Chart(document.getElementById('chartErros'), {
+        type: 'doughnut',
+        data: {
+            labels: erros.map(e => e.tipo),
+            datasets: [{
+                data: erros.map(e => e.total),
+                backgroundColor: errColors.slice(0, erros.length),
+                borderWidth: 0,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: { color: textColor, padding: 12 },
+                },
+            },
+        },
+    });
+    {% endif %}
+</script>
 {% endblock %}

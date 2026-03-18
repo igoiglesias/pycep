@@ -1,0 +1,164 @@
+/* Estilos compartilhados - PyCEP */
+
+/* ===== LAYOUT: libera o main da coluna estreita do simple.css (45rem) ===== */
+
+body > main {
+    grid-column: 1 / -1;
+    width: 92%;
+    max-width: 70rem;
+    margin-inline: auto;
+}
+
+/* ===== ERRO ===== */
+
+.error-msg {
+    color: #dc2626;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: var(--standard-border-radius);
+    padding: .6rem 1rem;
+    font-size: .95rem;
+    margin-bottom: 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    .error-msg {
+        color: #f87171;
+        background: #1c1010;
+        border-color: #7f1d1d;
+    }
+}
+
+/* ===== FORMS AUTH (login, cadastro) ===== */
+
+.auth-form {
+    max-width: 24rem;
+    margin: 0 auto;
+}
+
+.auth-form label {
+    margin-bottom: .25rem;
+}
+
+.auth-form input {
+    width: 100%;
+}
+
+.auth-form button[type="submit"] {
+    width: 100%;
+    margin-top: .5rem;
+}
+
+.auth-links {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: .9rem;
+}
+
+/* ===== TOKENS ===== */
+
+.token-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-bottom: 1rem;
+}
+
+.token-header h2 {
+    margin: 0;
+}
+
+.token-actions {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.token-actions form {
+    margin: 0;
+}
+
+/* Token copiado: feedback inline no botão */
+.copiar-feedback {
+    font-size: .85rem;
+    color: var(--accent);
+    font-weight: bold;
+}
+
+/* Valor completo do token acessível via data-attr, não via td hidden */
+.token-value {
+    font-family: var(--mono-font);
+    font-size: .9rem;
+    word-break: break-all;
+}
+
+/* ===== EMPTY STATE ===== */
+
+.empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-light);
+}
+
+.empty-state .icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: .5rem;
+}
+
+/* ===== DASHBOARD STATS ===== */
+
+.dash-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+@media (min-width: 48rem) {
+    .dash-grid {
+        grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    }
+}
+
+.stat-card {
+    text-align: center;
+}
+
+.stat-card h3 {
+    margin-top: 0;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--accent);
+    margin: .5rem 0;
+}
+
+/* ===== BOTÃO DESTRUCTIVO ===== */
+
+.btn-danger {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
+}
+
+.btn-danger:enabled:hover {
+    background: #b91c1c;
+    border-color: #b91c1c;
+}
+
+@media (prefers-color-scheme: dark) {
+    .btn-danger {
+        background: #991b1b;
+        border-color: #991b1b;
+    }
+    .btn-danger:enabled:hover {
+        background: #b91c1c;
+        border-color: #b91c1c;
+    }
+}

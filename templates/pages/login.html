@@ -1,25 +1,33 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/simple.min.css') }}">
-</head>
-<body>
-    <header>
-        <h1>Login</h1>
-    </header>
-    <main>
-        {% if error %}
-            <p style="color: red;">{{ error }}</p>
-        {% endif %}
-        <form action="{{ url_for('user_post_login') }}" method="post">
-            <input type="text" name="username" placeholder="fulado@exemplo.com">
-            <input type="password" name="password" placeholder="********">
-            <button type="submit">Login</button>
-        </form>
-    </main>
-    
-</body>
-</html>
+{% extends "components/base.html" %}
+
+{% block header %}
+<header>
+    <nav aria-label="Navegação">
+        <a href="/"><strong>PyCEP</strong></a>
+    </nav>
+    <h1>Login</h1>
+    <p>Acesse sua conta para gerenciar tokens e consultas.</p>
+</header>
+{% endblock %}
+
+{% block content %}
+<section>
+    {% if error %}
+        <p class="error-msg">{{ error }}</p>
+    {% endif %}
+
+    <form class="auth-form" action="{{ url_for('user_post_login') }}" method="post">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="username" placeholder="seu@email.com" autocomplete="email" required autofocus>
+
+        <label for="password">Senha</label>
+        <input type="password" id="password" name="password" placeholder="********" autocomplete="current-password" required>
+
+        <button type="submit">Entrar</button>
+    </form>
+
+    <p class="auth-links">
+        Não tem conta? <a href="{{ url_for('user_create') }}">Cadastre-se</a>
+    </p>
+</section>
+{% endblock %}

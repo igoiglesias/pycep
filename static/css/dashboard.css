@@ -1,0 +1,91 @@
+/* Dashboard admin - PyCEP */
+
+/* ===== KPI CARDS ===== */
+
+.kpi-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    border: none;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 48rem) {
+    .kpi-row {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.kpi-card {
+    text-align: center;
+    padding: 1.2rem 1rem;
+}
+
+.kpi-icon {
+    font-size: 1.6rem;
+    display: block;
+    margin-bottom: .3rem;
+}
+
+.kpi-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--accent);
+    margin: .25rem 0;
+    line-height: 1.2;
+}
+
+.kpi-value.kpi-danger {
+    color: #ef4444;
+}
+
+@media (prefers-color-scheme: dark) {
+    .kpi-value.kpi-danger { color: #f87171; }
+}
+
+.kpi-label {
+    margin: 0;
+    font-size: .85rem;
+    color: var(--text-light);
+}
+
+/* ===== CHART GRID ===== */
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: .5rem;
+}
+
+@media (min-width: 48rem) {
+    .chart-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.chart-grid section {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.chart-grid article {
+    padding: 1.2rem;
+}
+
+.chart-grid article h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.chart-grid canvas {
+    max-height: 280px;
+}
+
+.chart-grid table {
+    margin-top: 1rem;
+    font-size: .9rem;
+    width: 100%;
+}

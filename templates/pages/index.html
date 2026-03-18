@@ -1,82 +1,35 @@
 {% extends "components/base.html" %}
 
+{% block head %}
+    <meta name="description" content="API REST gratuita para consulta de CEP brasileiro. Cache inteligente, fallback automático entre ViaCEP e BrasilAPI, respostas em JSON.">
+    <meta name="theme-color" content="#6366f1">
+    <meta property="og:title" content="PyCEP — Consulta de CEP rápida e gratuita">
+    <meta property="og:description" content="API REST para consultar endereços brasileiros com cache inteligente e fallback automático.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pycep.igoriglesias.com/">
+    <meta property="og:locale" content="pt_BR">
+    <link rel="canonical" href="https://pycep.igoriglesias.com/">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/landing.css') }}">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebAPI",
+        "name": "PyCEP",
+        "url": "https://pycep.igoriglesias.com/",
+        "description": "API REST gratuita para consulta de CEP brasileiro com cache e fallback automático.",
+        "documentation": "https://pycep.igoriglesias.com/#docs",
+        "provider": {
+            "@type": "Organization",
+            "name": "PyCEP",
+            "url": "https://pycep.igoriglesias.com/"
+        }
+    }
+    </script>
+{% endblock %}
+
 {% block header %}
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/simple.min.css') }}">
-    <style>
-        :root {
-            --accent: #6366f1;
-            --accent-hover: #818cf8;
-            --accent-bg: #f0f0ff;
-        }
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --accent: #818cf8;
-                --accent-hover: #a5b4fc;
-                --accent-bg: #1e1e2e;
-            }
-        }
-
-        /* Grid de cards */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; }
-        .grid article { text-align: center; }
-        .grid article .icon { font-size: 2.4rem; display: block; margin-bottom: .5rem; }
-
-        /* Stats */
-        .stats { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; margin: 1.5rem 0; text-align: center; }
-        .stats div h3 { font-size: 2.2rem; margin: 0; color: var(--accent); }
-        .stats div p { margin: 0; color: var(--text-light); font-size: .95rem; }
-
-        /* Testimonials */
-        .testimonials { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
-        .testimonials blockquote { margin: 0; }
-        .testimonials cite { display: block; margin-top: .5rem; }
-
-        /* Docs grid */
-        .docs { display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: 1rem; }
-        .method {
-            display: inline-block;
-            background: var(--accent);
-            color: var(--accent-text);
-            padding: .1rem .5rem;
-            border-radius: var(--standard-border-radius);
-            font-size: .85rem;
-            font-weight: bold;
-            font-family: var(--mono-font);
-            vertical-align: middle;
-        }
-
-        /* CTA */
-        .cta { text-align: center; padding: 2rem 0; }
-        .cta .button { margin: .3rem; }
-
-        /* Hero */
-        body > header p.subtitle { font-size: 1.15rem; max-width: 38rem; }
-        body > header .hero-actions { margin-top: 1.5rem; }
-        body > header .hero-actions .button { margin: .3rem; font-size: 1.05rem; }
-        .button.outline {
-            background: transparent;
-            color: var(--accent);
-        }
-        .button.outline:hover {
-            background: var(--accent);
-            color: var(--accent-text);
-        }
-
-        /* Try section form */
-        #testar form { max-width: 28rem; margin: 0 auto; }
-        #testar textarea { max-width: 28rem; margin: 0 auto; display: block; }
-    </style>
-</head>
-<body>
-
 <header>
-    <nav>
+    <nav aria-label="Navegação principal">
         <a href="/"><strong>PyCEP</strong></a>
         <a href="#docs">Docs</a>
         <a href="#faq">FAQ</a>
@@ -85,8 +38,28 @@
     </nav>
     <h1>Consulta de CEP rápida, gratuita e inteligente</h1>
     <p class="subtitle">API REST para consultar endereços brasileiros. Cache em memória e SQLite, fallback automático entre ViaCEP e BrasilAPI, respostas em JSON — pronta para integrar.</p>
+
+    <!-- Input-capture hero: teste inline direto no hero -->
+    <form id="cepForm" class="hero-form">
+        <div class="hero-input-group">
+            <input
+                type="text"
+                id="cep"
+                name="cep"
+                placeholder="Digite um CEP: 01001-000"
+                inputmode="numeric"
+                maxlength="9"
+                pattern="\d{5}-?\d{3}"
+                autocomplete="postal-code"
+                required
+                aria-label="CEP para consulta"
+            >
+            <button type="submit" id="cepBtn">Consultar</button>
+        </div>
+    </form>
+    <output id="endereco" class="hero-result" for="cepForm" aria-live="polite"></output>
+
     <div class="hero-actions">
-        <a class="button" href="#testar">Testar agora</a>
         <a class="button outline" href="#docs">Ver documentação</a>
     </div>
 </header>
@@ -95,30 +68,114 @@
 {% block content %}
 
 <!-- Por que usar -->
-<section>
-    <h2>Por que usar o PyCEP?</h2>
+<section aria-labelledby="por-que-titulo">
+    <h2 id="por-que-titulo">Por que usar o PyCEP?</h2>
     <div class="grid">
         <article>
-            <span class="icon">⚡</span>
+            <span class="icon" aria-hidden="true">⚡</span>
             <h3>Cache inteligente</h3>
-            <p>Duas camadas: cache em memória (TTL de 1h) para respostas instantâneas e SQLite para persistência. CEPs já consultados nunca tocam APIs externas.</p>
+            <p>Duas camadas: cache em memória (TTL de 10 min) para respostas instantâneas e SQLite para persistência. CEPs já consultados nunca tocam APIs externas.</p>
         </article>
         <article>
-            <span class="icon">🔄</span>
+            <span class="icon" aria-hidden="true">🔄</span>
             <h3>Fallback automático</h3>
             <p>Se o ViaCEP falhar, a BrasilAPI responde. Seus usuários nunca veem erro por indisponibilidade de terceiros.</p>
         </article>
         <article>
-            <span class="icon">🔗</span>
+            <span class="icon" aria-hidden="true">🔗</span>
             <h3>Um GET e pronto</h3>
             <p>Sem SDK, sem API key para testes, sem configuração. Uma rota REST que retorna JSON — funciona com qualquer linguagem.</p>
         </article>
     </div>
 </section>
 
-<!-- Prova social -->
-<section>
-    <h2>Números que falam por si</h2>
+<!-- Documentação -->
+<section id="docs" aria-labelledby="docs-titulo">
+    <h2 id="docs-titulo">Documentação</h2>
+    <div class="docs">
+        <article>
+            <h3><span class="method">GET</span> /cep/{cep}</h3>
+            <p>Retorna o endereço completo em JSON. Aceita CEP com ou sem hífen.</p>
+            <div class="code-block">
+                <button class="copy-btn" aria-label="Copiar comando curl">Copiar</button>
+                <pre><code>curl https://pycep.igoriglesias.com/cep/01001000</code></pre>
+            </div>
+            <p><strong>Resposta:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" aria-label="Copiar resposta JSON">Copiar</button>
+<pre><code>{
+  "erro": false,
+  "mensagem": null,
+  "content": {
+    "cep": "01001-000",
+    "logradouro": "Praça da Sé",
+    "complemento": "",
+    "bairro": "Sé",
+    "localidade": "São Paulo",
+    "uf": "SP",
+    "ibge": "3550308",
+    "gia": "1004",
+    "ddd": "11",
+    "siafi": "7107"
+  }
+}</code></pre>
+            </div>
+        </article>
+        <article>
+            <h3>Integração rápida</h3>
+            <p><strong>JavaScript:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" aria-label="Copiar exemplo JavaScript">Copiar</button>
+<pre><code>const r = await fetch("https://pycep.igoriglesias.com/cep/01001000");
+const { content } = await r.json();
+console.log(content.logradouro);</code></pre>
+            </div>
+            <p><strong>Python:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" aria-label="Copiar exemplo Python">Copiar</button>
+<pre><code>import httpx
+
+r = httpx.get("https://pycep.igoriglesias.com/cep/01001000")
+print(r.json()["content"]["logradouro"])</code></pre>
+            </div>
+            <p><strong>Como funciona o cache:</strong></p>
+            <ol>
+                <li>Cache em memória (10 min TTL) — resposta imediata</li>
+                <li>SQLite — persistente entre reinícios</li>
+                <li>APIs externas — ViaCEP → BrasilAPI (fallback)</li>
+                <li>Fila de atualização — dados com 30+ dias são renovados em background</li>
+            </ol>
+        </article>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" aria-labelledby="faq-titulo">
+    <h2 id="faq-titulo">Perguntas Frequentes</h2>
+    <details>
+        <summary>O PyCEP é gratuito?</summary>
+        <p>Sim. O PyCEP é open source e gratuito para uso pessoal e comercial.</p>
+    </details>
+    <details>
+        <summary>De onde vêm os dados?</summary>
+        <p>Consultamos o ViaCEP como fonte primária e a BrasilAPI como fallback. Os dados são cacheados localmente em memória e em SQLite.</p>
+    </details>
+    <details>
+        <summary>Os dados ficam desatualizados?</summary>
+        <p>Não. CEPs com mais de 30 dias entram em uma fila de atualização automática que renova os dados em background, sem impactar a performance.</p>
+    </details>
+    <details>
+        <summary>Preciso de conta para usar a API?</summary>
+        <p>Para testar aqui na página, não. Para uso contínuo via API, crie uma conta gratuita para acesso autenticado.</p>
+    </details>
+    <details>
+        <summary>Posso contribuir com o projeto?</summary>
+        <p>Claro! O projeto é desenvolvido ao vivo no YouTube e o código é aberto. Contribuições são bem-vindas.</p>
+    </details>
+</section>
+
+<!-- CTA Final com prova social -->
+<section class="cta" aria-labelledby="cta-titulo">
     <div class="stats">
         <div>
             <h3>50k+</h3>
@@ -147,106 +204,11 @@
             <cite>— Rafael S., Estudante</cite>
         </blockquote>
     </div>
-</section>
-
-<!-- Documentação -->
-<section id="docs">
-    <h2>Documentação</h2>
-    <div class="docs">
-        <article>
-            <h3><span class="method">GET</span> /cep/{cep}</h3>
-            <p>Retorna o endereço completo em JSON. Aceita CEP com ou sem hífen.</p>
-            <pre><code>curl http://localhost:8000/cep/01001000</code></pre>
-            <p><strong>Resposta:</strong></p>
-<pre><code>{
-  "content": {
-    "cep": "01001-000",
-    "logradouro": "Praça da Sé",
-    "bairro": "Sé",
-    "localidade": "São Paulo",
-    "uf": "SP"
-  }
-}</code></pre>
-        </article>
-        <article>
-            <h3>Integração rápida</h3>
-            <p><strong>JavaScript:</strong></p>
-<pre><code>const r = await fetch("/cep/01001000");
-const { content } = await r.json();
-console.log(content.logradouro);</code></pre>
-            <p><strong>Python:</strong></p>
-<pre><code>import httpx
-
-r = httpx.get("http://localhost:8000/cep/01001000")
-print(r.json()["content"]["logradouro"])</code></pre>
-            <p><strong>Como funciona o cache:</strong></p>
-            <ol>
-                <li>Cache em memória (1h TTL) — resposta imediata</li>
-                <li>SQLite — persistente entre reinícios</li>
-                <li>APIs externas — ViaCEP → BrasilAPI (fallback)</li>
-                <li>Fila de atualização — dados com 30+ dias são renovados em background</li>
-            </ol>
-        </article>
-    </div>
-</section>
-
-<!-- Testar -->
-<section id="testar">
-    <h2>Teste agora</h2>
-    <p style="text-align:center;">Digite um CEP e veja a resposta em tempo real.</p>
-    <form id="cepForm">
-        <label for="cep">CEP</label>
-        <input
-            type="text"
-            id="cep"
-            name="cep"
-            placeholder="00000-000"
-            pattern="\d{5}-?\d{3}"
-            required
-        >
-        <button type="submit">Consultar</button>
-    </form>
-    <label for="endereco" style="max-width:28rem;margin:0 auto;display:block;">Resultado</label>
-    <textarea
-        id="endereco"
-        rows="4"
-        readonly
-        placeholder="O endereço aparecerá aqui..."
-    ></textarea>
-</section>
-
-<!-- FAQ -->
-<section id="faq">
-    <h2>Perguntas Frequentes</h2>
-    <details>
-        <summary>O PyCEP é gratuito?</summary>
-        <p>Sim. O PyCEP é open source e gratuito para uso pessoal e comercial.</p>
-    </details>
-    <details>
-        <summary>De onde vêm os dados?</summary>
-        <p>Consultamos o ViaCEP como fonte primária e a BrasilAPI como fallback. Os dados são cacheados localmente em memória e em SQLite.</p>
-    </details>
-    <details>
-        <summary>Os dados ficam desatualizados?</summary>
-        <p>Não. CEPs com mais de 30 dias entram em uma fila de atualização automática que renova os dados em background, sem impactar a performance.</p>
-    </details>
-    <details>
-        <summary>Preciso de conta para usar a API?</summary>
-        <p>Para testar aqui na página, não. Para uso contínuo via API, crie uma conta gratuita para acesso autenticado.</p>
-    </details>
-    <details>
-        <summary>Posso contribuir com o projeto?</summary>
-        <p>Claro! O projeto é desenvolvido ao vivo no YouTube e o código é aberto. Contribuições são bem-vindas.</p>
-    </details>
-</section>
-
-<!-- CTA Final -->
-<div class="cta">
-    <h2>Pronto para começar?</h2>
+    <h2 id="cta-titulo">Pronto para começar?</h2>
     <p>Crie sua conta gratuita e integre a consulta de CEP no seu projeto.</p>
     <a class="button" href="{{ url_for('user_create') }}">Criar conta gratuita</a>
     <a class="button outline" href="{{ url_for('user_login') }}">Já tenho conta</a>
-</div>
+</section>
 
 {% endblock %}
 
@@ -255,37 +217,72 @@ print(r.json()["content"]["logradouro"])</code></pre>
     const form = document.getElementById("cepForm");
     const cepInput = document.getElementById("cep");
     const resultado = document.getElementById("endereco");
+    const btn = document.getElementById("cepBtn");
+
+    // Máscara de CEP: formata automaticamente para 00000-000
+    cepInput.addEventListener("input", (e) => {
+        let v = e.target.value.replace(/\D/g, "").slice(0, 8);
+        if (v.length > 5) v = v.slice(0, 5) + "-" + v.slice(5);
+        e.target.value = v;
+    });
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
         const cep = cepInput.value.replace(/\D/g, "");
         if (cep.length !== 8) {
-            resultado.value = "CEP inválido.";
+            resultado.textContent = "CEP inválido.";
+            resultado.classList.add("visible", "error");
             return;
         }
 
-        resultado.value = "Consultando...";
+        btn.disabled = true;
+        btn.textContent = "Consultando...";
+        resultado.textContent = "Consultando...";
+        resultado.classList.add("visible");
+        resultado.classList.remove("error");
 
         try {
             const response = await fetch(`/cep/${cep}`);
+
+            if (response.status === 429) {
+                resultado.textContent = "Muitas consultas seguidas. Aguarde um momento e tente novamente.";
+                resultado.classList.add("error");
+                return;
+            }
+
             if (!response.ok) throw new Error("Erro na requisição");
 
             const data = await response.json();
 
             if (data.erro) {
-                resultado.value = data.mensagem || "CEP não encontrado.";
+                resultado.textContent = data.mensagem || "CEP não encontrado.";
+                resultado.classList.add("error");
                 return;
             }
 
             const { logradouro, bairro, localidade, uf } = data.content;
-
-            resultado.value =
-                `${logradouro}\n${bairro}\n${localidade} - ${uf}`;
+            resultado.textContent = `${logradouro}, ${bairro} — ${localidade}/${uf}`;
+            resultado.classList.remove("error");
 
         } catch (err) {
-            resultado.value = "Erro ao consultar API.";
+            resultado.textContent = "Erro ao consultar API. Tente novamente.";
+            resultado.classList.add("error");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Consultar";
         }
+    });
+
+    // Copy-to-clipboard nos blocos de código
+    document.querySelectorAll(".copy-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const code = btn.closest(".code-block").querySelector("code").textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.textContent = "Copiado!";
+                setTimeout(() => { btn.textContent = "Copiar"; }, 1500);
+            });
+        });
     });
 </script>
 {% endblock %}

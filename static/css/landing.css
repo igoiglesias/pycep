@@ -1,0 +1,221 @@
+/* Landing page - PyCEP */
+
+:root {
+    --accent: #6366f1;
+    --accent-hover: #818cf8;
+    --accent-bg: #f0f0ff;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --accent: #818cf8;
+        --accent-hover: #a5b4fc;
+        --accent-bg: #1e1e2e;
+    }
+}
+
+/* Smooth scroll para âncoras */
+html { scroll-behavior: smooth; }
+
+/* Espaçamento entre seções */
+main > section { margin-bottom: 1rem; }
+
+/* ===== HERO ===== */
+
+body > header p.subtitle {
+    font-size: 1.15rem;
+    max-width: 38rem;
+}
+
+/* Input-capture hero: formulário inline no hero */
+.hero-form {
+    max-width: 28rem;
+    margin: 1.5rem auto 0;
+}
+
+.hero-input-group {
+    display: flex;
+    gap: .5rem;
+}
+
+.hero-input-group input {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.hero-input-group button {
+    white-space: nowrap;
+    margin-bottom: 0;
+}
+
+/* Resultado do hero */
+.hero-result {
+    display: none;
+    max-width: 28rem;
+    margin: .75rem auto 0;
+    padding: .6rem 1rem;
+    border-radius: var(--standard-border-radius);
+    background: var(--accent-bg);
+    text-align: center;
+    font-size: .95rem;
+    animation: fadeIn .2s ease-out;
+}
+
+.hero-result.visible { display: block; }
+
+.hero-result.error { color: #dc2626; }
+
+@media (prefers-color-scheme: dark) {
+    .hero-result.error { color: #f87171; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+body > header .hero-actions {
+    margin-top: 1.2rem;
+}
+
+body > header .hero-actions .button {
+    margin: .3rem;
+    font-size: 1.05rem;
+}
+
+/* ===== BOTÃO OUTLINE ===== */
+
+.button.outline {
+    background: transparent;
+    color: var(--accent);
+}
+
+.button.outline:hover {
+    background: var(--accent);
+    color: var(--accent-text, #fff);
+}
+
+/* ===== GRID DE CARDS ===== */
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1.5rem;
+}
+
+.grid article {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--standard-border-radius);
+}
+
+.grid article .icon {
+    font-size: 2.4rem;
+    display: block;
+    margin-bottom: .5rem;
+}
+
+/* ===== STATS ===== */
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.stats div h3 {
+    font-size: 2.2rem;
+    margin: 0;
+    color: var(--accent);
+}
+
+.stats div p {
+    margin: 0;
+    color: var(--text-light);
+    font-size: .95rem;
+}
+
+/* ===== TESTIMONIALS ===== */
+
+.testimonials {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.testimonials blockquote { margin: 0; }
+.testimonials cite { display: block; margin-top: .5rem; }
+
+/* ===== DOCS ===== */
+
+.docs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: 1.5rem;
+}
+
+.method {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--accent-text, #fff);
+    padding: .1rem .5rem;
+    border-radius: var(--standard-border-radius);
+    font-size: .85rem;
+    font-weight: bold;
+    font-family: var(--mono-font);
+    vertical-align: middle;
+}
+
+/* Code blocks com botão copiar */
+.code-block {
+    position: relative;
+}
+
+.code-block pre {
+    margin: 0;
+}
+
+.copy-btn {
+    position: absolute;
+    top: .5rem;
+    right: .5rem;
+    padding: .2rem .6rem;
+    font-size: .75rem;
+    cursor: pointer;
+    background: var(--accent);
+    color: var(--accent-text, #fff);
+    border: none;
+    border-radius: var(--standard-border-radius);
+    opacity: 0;
+    transition: opacity .15s ease;
+}
+
+.code-block:hover .copy-btn {
+    opacity: 1;
+}
+
+/* Em touch, sempre visível */
+@media (hover: none) {
+    .copy-btn { opacity: 1; }
+}
+
+/* ===== CTA ===== */
+
+.cta {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.cta .button { margin: .3rem; }
+
+/* ===== UTILS ===== */
+
+button[disabled] {
+    opacity: .6;
+    cursor: not-allowed;
+}
