@@ -41,6 +41,17 @@ app = FastAPI(
 )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.middleware("http")
+async def add_cache_headers(request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith("/static/"):
+        if request.url.path.endswith((".woff2", ".min.css", ".min.js")):
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        else:
+            response.headers["Cache-Control"] = "public, max-age=86400"
+    return response
 templates = Jinja2Templates(directory="templates")
 templates.env.filters["format_error"] = format_error_messages
 
