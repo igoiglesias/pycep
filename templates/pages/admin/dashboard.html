@@ -20,7 +20,7 @@
     </article>
     <article class="kpi-card">
         <span class="kpi-icon" aria-hidden="true">⚡</span>
-        <p class="kpi-value">{{ avg_response_time }}ms</p>
+        <p class="kpi-value">{{ avg_response_time }}</p>
         <p class="kpi-label">Tempo médio</p>
     </article>
     <article class="kpi-card">
@@ -115,10 +115,10 @@
 
     function getThemeColors(isDark) {
         return {
-            text: isDark ? '#dcdcdc' : '#212121',
-            grid: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
-            accent: isDark ? '#818cf8' : '#6366f1',
-            accentLight: isDark ? 'rgba(129,140,248,0.2)' : 'rgba(99,102,241,0.15)',
+            text: isDark ? '#e2dfd8' : '#1a1814',
+            grid: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)',
+            accent: isDark ? '#efa502' : '#bf8602',
+            accentLight: isDark ? 'rgba(239,165,2,0.15)' : 'rgba(191,134,2,0.1)',
         };
     }
 
@@ -133,8 +133,8 @@
             maintainAspectRatio: true,
             plugins: { legend: { display: false } },
             scales: {
-                x: { ticks: { color: c.text }, grid: { color: c.grid } },
-                y: { ticks: { color: c.text }, grid: { color: c.grid }, beginAtZero: true },
+                x: { ticks: { color: c.text, maxRotation: 45, autoSkipPadding: 8, font: { size: 11 } }, grid: { color: c.grid } },
+                y: { ticks: { color: c.text, font: { size: 11 } }, grid: { color: c.grid }, beginAtZero: true },
             },
         };
 
@@ -177,7 +177,7 @@
                 labels: topCeps.map(x => x.cep),
                 datasets: [{
                     data: topCeps.map(x => x.total),
-                    backgroundColor: [c.accent, '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'],
+                    backgroundColor: [c.accent, '#d97706', '#b45309', '#92400e', '#78350f'],
                     borderRadius: 4,
                 }]
             },
@@ -187,7 +187,7 @@
 
         // Erros por tipo (doughnut)
         {% if erros_por_tipo %}
-        const errColors = ['#ef4444', '#f97316', '#eab308', '#06b6d4', '#8b5cf6', '#ec4899'];
+        const errColors = ['#ef4444', '#f97316', '#eab308', '#06b6d4', '#0ea5e9', '#ec4899'];
         charts.push(new Chart(document.getElementById('chartErros'), {
             type: 'doughnut',
             data: {

@@ -2,7 +2,7 @@
 
 {% block head %}
     <meta name="description" content="API REST gratuita para consulta de CEP brasileiro. Cache inteligente, fallback automático entre ViaCEP e BrasilAPI, respostas em JSON.">
-    <meta name="theme-color" content="#6366f1">
+    <meta name="theme-color" content="#efa502">
     <meta property="og:title" content="PyCEP — Consulta de CEP rápida e gratuita">
     <meta property="og:description" content="API REST para consultar endereços brasileiros com cache inteligente e fallback automático.">
     <meta property="og:type" content="website">
@@ -30,7 +30,7 @@
 {% block header %}
 <header>
     <nav aria-label="Navegação principal">
-        <a href="/"><strong>PyCEP</strong></a>
+        <a href="/" class="nav-logo">Py<span>CEP</span></a>
         <a href="#docs">Docs</a>
         <a href="#faq">FAQ</a>
         <a href="{{ url_for('user_login') }}">Login</a>
@@ -68,20 +68,20 @@
 {% block content %}
 
 <!-- Por que usar -->
-<section aria-labelledby="por-que-titulo">
+<section aria-labelledby="por-que-titulo" class="animate-in">
     <h2 id="por-que-titulo">Por que usar o PyCEP?</h2>
     <div class="grid">
-        <article>
+        <article class="animate-in animate-in-delay-1">
             <span class="icon" aria-hidden="true">⚡</span>
             <h3>Cache inteligente</h3>
             <p>Duas camadas: cache em memória (TTL de 10 min) para respostas instantâneas e SQLite para persistência. CEPs já consultados nunca tocam APIs externas.</p>
         </article>
-        <article>
+        <article class="animate-in animate-in-delay-2">
             <span class="icon" aria-hidden="true">🔄</span>
             <h3>Fallback automático</h3>
             <p>Se o ViaCEP falhar, a BrasilAPI responde. Seus usuários nunca veem erro por indisponibilidade de terceiros.</p>
         </article>
-        <article>
+        <article class="animate-in animate-in-delay-3">
             <span class="icon" aria-hidden="true">🔗</span>
             <h3>Um GET e pronto</h3>
             <p>Sem SDK, sem API key para testes, sem configuração. Uma rota REST que retorna JSON — funciona com qualquer linguagem.</p>
@@ -90,7 +90,7 @@
 </section>
 
 <!-- Documentação -->
-<section id="docs" aria-labelledby="docs-titulo">
+<section id="docs" aria-labelledby="docs-titulo" class="animate-in">
     <h2 id="docs-titulo">Documentação</h2>
     <div class="docs">
         <article>
@@ -150,7 +150,7 @@ print(r.json()["content"]["logradouro"])</code></pre>
 </section>
 
 <!-- FAQ -->
-<section id="faq" aria-labelledby="faq-titulo">
+<section id="faq" aria-labelledby="faq-titulo" class="animate-in">
     <h2 id="faq-titulo">Perguntas Frequentes</h2>
     <details>
         <summary>O PyCEP é gratuito?</summary>
@@ -175,20 +175,13 @@ print(r.json()["content"]["logradouro"])</code></pre>
 </section>
 
 <!-- CTA Final -->
-<section class="cta" aria-labelledby="cta-titulo">
-    <div class="badges">
-        <div class="badge">
-            <span class="badge-icon" aria-hidden="true">🐍</span>
-            <p>Python + FastAPI</p>
-        </div>
-        <div class="badge">
-            <span class="badge-icon" aria-hidden="true">📺</span>
-            <p>Construído ao vivo no YouTube</p>
-        </div>
-        <div class="badge">
-            <span class="badge-icon" aria-hidden="true">📖</span>
-            <p>Open Source</p>
-        </div>
+<section class="cta animate-in" aria-labelledby="cta-titulo">
+    <div class="tech-strip">
+        <span class="tech-chip">Python + FastAPI</span>
+        <span class="tech-chip-sep" aria-hidden="true">/</span>
+        <span class="tech-chip">Ao vivo no YouTube</span>
+        <span class="tech-chip-sep" aria-hidden="true">/</span>
+        <span class="tech-chip">Open Source</span>
     </div>
     <h2 id="cta-titulo">Pronto para começar?</h2>
     <p>Crie sua conta gratuita e integre a consulta de CEP no seu projeto.</p>

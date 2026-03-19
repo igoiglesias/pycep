@@ -16,11 +16,24 @@ class Admin:
 
         taxa_erro = round((total_erros / total_consultas) * 100, 1) if total_consultas else 0
 
+        # Formata valores grandes para exibição
+        if avg_response_time >= 1000:
+            avg_response_time_fmt = f"{round(avg_response_time / 1000, 1)}s"
+        else:
+            avg_response_time_fmt = f"{avg_response_time}ms"
+
+        if total_consultas >= 1_000_000:
+            total_consultas_fmt = f"{round(total_consultas / 1_000_000, 1)}M"
+        elif total_consultas >= 1_000:
+            total_consultas_fmt = f"{round(total_consultas / 1_000, 1)}K"
+        else:
+            total_consultas_fmt = str(total_consultas)
+
         return {
-            "total_consultas": total_consultas,
+            "total_consultas": total_consultas_fmt,
             "total_erros": total_erros,
             "taxa_erro": taxa_erro,
-            "avg_response_time": avg_response_time,
+            "avg_response_time": avg_response_time_fmt,
             "total_users": total_users,
             "top_ceps": [{"cep": r["cep"], "total": r["total"]} for r in (top_ceps or [])],
             "consultas_por_mes": [{"mes": r["mes"], "total": r["total"]} for r in (consultas_por_mes or [])],

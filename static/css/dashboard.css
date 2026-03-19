@@ -1,4 +1,7 @@
-/* Dashboard admin - PyCEP */
+/* ============================================================
+   PyCEP — Admin Dashboard
+   KPI cards + Chart grid com estilo consistente
+   ============================================================ */
 
 /* ===== KPI CARDS ===== */
 
@@ -8,7 +11,7 @@
     gap: 1rem;
     border: none;
     padding: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 @media (min-width: 48rem) {
@@ -19,43 +22,62 @@
 
 .kpi-card {
     text-align: center;
-    padding: 1.2rem 1rem;
+    padding: 1.5rem 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0.5;
+}
+
+.kpi-card:nth-child(2)::before {
+    background: linear-gradient(90deg, var(--danger), transparent);
 }
 
 .kpi-icon {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     display: block;
-    margin-bottom: .3rem;
+    margin-bottom: .5rem;
 }
 
 .kpi-value {
-    font-size: 2rem;
-    font-weight: bold;
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    font-weight: 700;
     color: var(--accent);
     margin: .25rem 0;
-    line-height: 1.2;
+    line-height: 1;
+    letter-spacing: -0.03em;
 }
 
 .kpi-value.kpi-danger {
-    color: #ef4444;
-}
-
-@media (prefers-color-scheme: dark) {
-    .kpi-value.kpi-danger { color: #f87171; }
+    color: var(--danger);
 }
 
 .kpi-label {
     margin: 0;
-    font-size: .85rem;
+    font-size: .75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
     color: var(--text-light);
 }
+
 
 /* ===== CHART GRID ===== */
 
 .chart-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: .5rem;
+    gap: 1rem;
 }
 
 @media (min-width: 48rem) {
@@ -71,13 +93,28 @@
 }
 
 .chart-grid article {
-    padding: 1.2rem;
+    padding: 1.5rem;
 }
 
 .chart-grid article h3 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
     margin-top: 0;
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
+    margin-bottom: 1.2rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.chart-grid article h3::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 1em;
+    background: var(--accent);
+    border-radius: 2px;
 }
 
 .chart-grid canvas {
@@ -86,6 +123,15 @@
 
 .chart-grid table {
     margin-top: 1rem;
-    font-size: .9rem;
+    font-size: .85rem;
     width: 100%;
+}
+
+.chart-grid table code {
+    font-family: var(--mono-font);
+    font-size: .8rem;
+    background: var(--accent-bg);
+    color: var(--accent);
+    padding: .1rem .4rem;
+    border-radius: 4px;
 }
