@@ -31,11 +31,14 @@ async def index(request: Request):
 @router.get("/dashboard", response_class=HTMLResponse)
 @auth_service.verify(perfil="user")
 async def user_dashboard(request: Request):
+    user = request.state.user
+    dashboard_data = await user_service.get_dashboard_data(user['id'])
     return templates.TemplateResponse(
-        "pages/dashboard.html", 
+        "pages/dashboard.html",
         {
             "request": request,
-            "title": "Dashboard"
+            "title": "Dashboard",
+            **dashboard_data
         }
     )
 

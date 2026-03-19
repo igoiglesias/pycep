@@ -65,6 +65,18 @@ class User:
         return return_data
     
 
+    async def get_dashboard_data(self, user_id: int) -> dict:
+        """Retorna dados do dashboard do usuário."""
+        total_consultas = await self.repo.get_total_consultas_by_user(user_id)
+        total_tokens = await self.repo.get_total_tokens_by_user(user_id)
+        consultas_mes = await self.repo.get_consultas_mes_by_user(user_id)
+        return {
+            "total_consultas": total_consultas,
+            "total_tokens": total_tokens,
+            "consultas_mes": consultas_mes,
+        }
+
+
     async def get_tokens(self, user_id: int) -> list:
         """Retorna os tokens do usuário."""
         tokens = await self.repo.get_tokens_by_user_id(user_id)

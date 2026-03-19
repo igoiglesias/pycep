@@ -2,8 +2,25 @@
 
 {% block content %}
 <section>
-    <h2>Olá, {{ request.state.user.name }}</h2>
     <p>Gerencie seus tokens de acesso e integre a API de CEP no seu projeto.</p>
+
+    <div class="kpi-row-user">
+        <article>
+            <span class="kpi-icon" aria-hidden="true">🔑</span>
+            <p class="kpi-value-user">{{ total_tokens }}</p>
+            <p class="kpi-label-user">Tokens ativos</p>
+        </article>
+        <article>
+            <span class="kpi-icon" aria-hidden="true">📊</span>
+            <p class="kpi-value-user">{{ total_consultas }}</p>
+            <p class="kpi-label-user">Consultas totais</p>
+        </article>
+        <article>
+            <span class="kpi-icon" aria-hidden="true">📅</span>
+            <p class="kpi-value-user">{{ consultas_mes }}</p>
+            <p class="kpi-label-user">Consultas este mês</p>
+        </article>
+    </div>
 
     <div class="dash-grid">
         <article>

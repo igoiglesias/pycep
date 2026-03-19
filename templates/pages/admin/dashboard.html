@@ -104,111 +104,112 @@
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <script>
-    // Detecta dark mode para cores dos gráficos
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const textColor = isDark ? '#dcdcdc' : '#212121';
-    const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
-    const accent = isDark ? '#818cf8' : '#6366f1';
-    const accentLight = isDark ? 'rgba(129,140,248,0.2)' : 'rgba(99,102,241,0.15)';
-
-    const defaultOptions = {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-            legend: { display: false },
-        },
-        scales: {
-            x: { ticks: { color: textColor }, grid: { color: gridColor } },
-            y: { ticks: { color: textColor }, grid: { color: gridColor }, beginAtZero: true },
-        },
-    };
-
-    // --- Consultas por mês (bar) ---
+    // Dados do servidor
     const meses = {{ consultas_por_mes | tojson }};
-    new Chart(document.getElementById('chartMes'), {
-        type: 'bar',
-        data: {
-            labels: meses.map(m => {
-                const [y, mo] = m.mes.split('-');
-                return new Date(y, mo - 1).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
-            }),
-            datasets: [{
-                data: meses.map(m => m.total),
-                backgroundColor: accent,
-                borderRadius: 4,
-            }]
-        },
-        options: defaultOptions,
-    });
-
-    // --- Consultas por dia (line) ---
     const dias = {{ consultas_por_dia | tojson }};
-    new Chart(document.getElementById('chartDia'), {
-        type: 'line',
-        data: {
-            labels: dias.map(d => {
-                const dt = new Date(d.dia + 'T00:00:00');
-                return dt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-            }),
-            datasets: [{
-                data: dias.map(d => d.total),
-                borderColor: accent,
-                backgroundColor: accentLight,
-                fill: true,
-                tension: 0.3,
-                pointRadius: 3,
-                pointBackgroundColor: accent,
-            }]
-        },
-        options: defaultOptions,
-    });
+    {% if top_ceps %}const topCeps = {{ top_ceps | tojson }};{% endif %}
+    {% if erros_por_tipo %}const erros = {{ erros_por_tipo | tojson }};{% endif %}
 
-    // --- Top CEPs (horizontal bar) ---
-    {% if top_ceps %}
-    const topCeps = {{ top_ceps | tojson }};
-    new Chart(document.getElementById('chartTopCeps'), {
-        type: 'bar',
-        data: {
-            labels: topCeps.map(c => c.cep),
-            datasets: [{
-                data: topCeps.map(c => c.total),
-                backgroundColor: [accent, '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'],
-                borderRadius: 4,
-            }]
-        },
-        options: {
-            ...defaultOptions,
-            indexAxis: 'y',
-        },
-    });
-    {% endif %}
+    const charts = [];
+    const darkMq = window.matchMedia('(prefers-color-scheme: dark)');
 
-    // --- Erros por tipo (doughnut) ---
-    {% if erros_por_tipo %}
-    const erros = {{ erros_por_tipo | tojson }};
-    const errColors = ['#ef4444', '#f97316', '#eab308', '#06b6d4', '#8b5cf6', '#ec4899'];
-    new Chart(document.getElementById('chartErros'), {
-        type: 'doughnut',
-        data: {
-            labels: erros.map(e => e.tipo),
-            datasets: [{
-                data: erros.map(e => e.total),
-                backgroundColor: errColors.slice(0, erros.length),
-                borderWidth: 0,
-            }]
-        },
-        options: {
+    function getThemeColors(isDark) {
+        return {
+            text: isDark ? '#dcdcdc' : '#212121',
+            grid: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+            accent: isDark ? '#818cf8' : '#6366f1',
+            accentLight: isDark ? 'rgba(129,140,248,0.2)' : 'rgba(99,102,241,0.15)',
+        };
+    }
+
+    function renderCharts() {
+        charts.forEach(c => c.destroy());
+        charts.length = 0;
+
+        const c = getThemeColors(darkMq.matches);
+
+        const defaultOptions = {
             responsive: true,
             maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                    labels: { color: textColor, padding: 12 },
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: c.text }, grid: { color: c.grid } },
+                y: { ticks: { color: c.text }, grid: { color: c.grid }, beginAtZero: true },
+            },
+        };
+
+        // Consultas por mês (bar)
+        charts.push(new Chart(document.getElementById('chartMes'), {
+            type: 'bar',
+            data: {
+                labels: meses.map(m => {
+                    const [y, mo] = m.mes.split('-');
+                    return new Date(y, mo - 1).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+                }),
+                datasets: [{ data: meses.map(m => m.total), backgroundColor: c.accent, borderRadius: 4 }]
+            },
+            options: defaultOptions,
+        }));
+
+        // Consultas por dia (line)
+        charts.push(new Chart(document.getElementById('chartDia'), {
+            type: 'line',
+            data: {
+                labels: dias.map(d => {
+                    const dt = new Date(d.dia + 'T00:00:00');
+                    return dt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                }),
+                datasets: [{
+                    data: dias.map(d => d.total),
+                    borderColor: c.accent,
+                    backgroundColor: c.accentLight,
+                    fill: true, tension: 0.3, pointRadius: 3, pointBackgroundColor: c.accent,
+                }]
+            },
+            options: defaultOptions,
+        }));
+
+        // Top CEPs (horizontal bar)
+        {% if top_ceps %}
+        charts.push(new Chart(document.getElementById('chartTopCeps'), {
+            type: 'bar',
+            data: {
+                labels: topCeps.map(x => x.cep),
+                datasets: [{
+                    data: topCeps.map(x => x.total),
+                    backgroundColor: [c.accent, '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'],
+                    borderRadius: 4,
+                }]
+            },
+            options: { ...defaultOptions, indexAxis: 'y' },
+        }));
+        {% endif %}
+
+        // Erros por tipo (doughnut)
+        {% if erros_por_tipo %}
+        const errColors = ['#ef4444', '#f97316', '#eab308', '#06b6d4', '#8b5cf6', '#ec4899'];
+        charts.push(new Chart(document.getElementById('chartErros'), {
+            type: 'doughnut',
+            data: {
+                labels: erros.map(e => e.tipo),
+                datasets: [{
+                    data: erros.map(e => e.total),
+                    backgroundColor: errColors.slice(0, erros.length),
+                    borderWidth: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: true, position: 'bottom', labels: { color: c.text, padding: 12 } },
                 },
             },
-        },
-    });
-    {% endif %}
+        }));
+        {% endif %}
+    }
+
+    renderCharts();
+    darkMq.addEventListener('change', renderCharts);
 </script>
 {% endblock %}

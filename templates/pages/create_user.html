@@ -25,6 +25,7 @@
 
         <label for="password">Senha</label>
         <input type="password" id="password" name="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" required>
+        <small>A senha deve ter no mínimo 6 caracteres.</small>
 
         <button type="submit">Criar conta</button>
     </form>
@@ -33,4 +34,14 @@
         Já tem conta? <a href="{{ url_for('user_login') }}">Fazer login</a>
     </p>
 </section>
+{% endblock %}
+
+{% block script %}
+<script>
+    document.querySelector('.auth-form').addEventListener('submit', function() {
+        const btn = this.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.textContent = 'Criando conta...';
+    });
+</script>
 {% endblock %}

@@ -1,9 +1,10 @@
 <header>
+    {% set current_path = request.url.path %}
     {% if request.state.user %}
     <nav aria-label="Navegação do painel">
         <a href="/"><strong>PyCEP</strong></a>
-        <a href="{{ url_for('user_dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('user_token') }}">Tokens</a>
+        <a href="{{ url_for('user_dashboard') }}" {% if current_path == '/dashboard' %}aria-current="page"{% endif %}>Dashboard</a>
+        <a href="{{ url_for('user_token') }}" {% if current_path.startswith('/user/token') %}aria-current="page"{% endif %}>Tokens</a>
         <a href="{{ url_for('user_logout') }}">Sair</a>
     </nav>
     <h1>Olá, {{ request.state.user.name }}</h1>

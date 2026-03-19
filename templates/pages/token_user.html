@@ -14,7 +14,8 @@
     {% endif %}
 
     {% if tokens %}
-    <table>
+    <div class="token-table-wrapper">
+    <table class="token-table">
         <thead>
             <tr>
                 <th scope="col">Nome</th>
@@ -39,6 +40,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     {% else %}
     <div class="empty-state">
         <span class="icon" aria-hidden="true">🔑</span>

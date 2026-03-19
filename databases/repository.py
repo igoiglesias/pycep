@@ -350,6 +350,26 @@ class Repository:
         return await self.db.fetchall(query)
 
 
+    # ===== DASHBOARD USUÁRIO =====
+
+    async def get_total_consultas_by_user(self, user_id: int) -> int:
+        query = 'SELECT COUNT(*) as total FROM request_log WHERE user_id = ?'
+        row = await self.db.fetchone(query, (user_id,))
+        return row['total'] if row else 0
+
+
+    async def get_total_tokens_by_user(self, user_id: int) -> int:
+        query = 'SELECT COUNT(*) as total FROM token WHERE user = ? AND active = 1'
+        row = await self.db.fetchone(query, (user_id,))
+        return row['total'] if row else 0
+
+
+    async def get_consultas_mes_by_user(self, user_id: int) -> int:
+        query = "SELECT COUNT(*) as total FROM request_log WHERE user_id = ? AND created_at >= date('now', 'start of month')"
+        row = await self.db.fetchone(query, (user_id,))
+        return row['total'] if row else 0
+
+
     async def get_tokens_by_user_id(self, user_id: int) -> Iterable[aiosqlite.Row] | None:
         query = '''
             SELECT id, name, token FROM token
